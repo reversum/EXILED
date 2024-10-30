@@ -44,6 +44,7 @@ namespace Exiled.Events.Patches.Events.Player
             Label returnLabel = generator.DefineLabel();
             Label continueLabel = generator.DefineLabel();
             Label jmp = generator.DefineLabel();
+            Label skip = generator.DefineLabel();
 
             LocalBuilder changingRoleEventArgs = generator.DeclareLocal(typeof(ChangingRoleEventArgs));
             LocalBuilder player = generator.DeclareLocal(typeof(API.Features.Player));
@@ -172,6 +173,8 @@ namespace Exiled.Events.Patches.Events.Player
 
                     // Handlers.Player.OnSpawned(spawnedEventArgs)
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.OnSpawned))),
+
+                    new CodeInstruction(OpCodes.Nop).WithLabels(skip),
                 });
 
             newInstructions[newInstructions.Count - 1].labels.Add(returnLabel);
