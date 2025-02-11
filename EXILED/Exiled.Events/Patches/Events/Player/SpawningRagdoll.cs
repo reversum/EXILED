@@ -91,7 +91,7 @@ namespace Exiled.Events.Patches.Events.Player
 
                 // ev.Scale
                 new(OpCodes.Ldloc_S, ev.LocalIndex),
-                new(OpCodes.Callvirt, PropertyGetter(typeof(SpawningRagdollEventArgs), nameof(SpawningRagdollEventArgs.Scale))),
+                new(OpCodes.Callvirt, PropertyGetter(typeof(SpawningRagdollEventArgs), nameof(SpawningRagdollEventArgs.RagdollScale))),
 
                 // newScale = Vector3.Scale(ragdollScale, ev.Scale);
                 new(OpCodes.Call, Method(typeof(Vector3), nameof(Vector3.Scale), new[] { typeof(Vector3), typeof(Vector3) })),

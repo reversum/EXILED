@@ -22,8 +22,6 @@ namespace Exiled.Events.Patches.Events.Player
 
     using MapGeneration.Distributors;
 
-    using PluginAPI.Events;
-
     using static HarmonyLib.AccessTools;
 
     /// <summary>
@@ -68,7 +66,7 @@ namespace Exiled.Events.Patches.Events.Player
                 });
 
             offset = -8;
-            index = newInstructions.FindIndex(instruction => instruction.opcode == OpCodes.Newobj && (ConstructorInfo)instruction.operand == GetDeclaredConstructors(typeof(PlayerCloseGeneratorEvent))[0]) + offset;
+            index = newInstructions.FindIndex(instruction => instruction.opcode == OpCodes.Newobj && (ConstructorInfo)instruction.operand == GetDeclaredConstructors(typeof(LabApi.Events.Arguments.PlayerEvents.PlayerClosingGeneratorEventArgs))[0]) + offset;
 
             // if (this.HasFlag(_flags, GeneratorFlags.Open))
             // {
@@ -169,18 +167,14 @@ namespace Exiled.Events.Patches.Events.Player
 
             newInstructions.RemoveRange(index, 7);
 
-            offset = -2;
-            int index2 = newInstructions.FindLastIndex(instruction => instruction.opcode == OpCodes.Newobj && (ConstructorInfo)instruction.operand == GetDeclaredConstructors(typeof(PlayerUnlockGeneratorEvent))[0]) + offset;
-
+            offset = -3;
+            index = newInstructions.FindLastIndex(x => x.operand == (object)Field(typeof(Scp079Generator), nameof(Scp079Generator._unlockCooldownTime))) + offset;
             newInstructions.InsertRange(
                 index,
                 new[]
                 {
-                    // isAllowed var set
-                    new(OpCodes.Ldc_I4_0),
-                    new(OpCodes.Br_S, skip2),
-                    new CodeInstruction(OpCodes.Ldc_I4_1).MoveLabelsFrom(newInstructions[index2]),
-                    new CodeInstruction(OpCodes.Stloc_S, isAllowedUnlocking.LocalIndex).WithLabels(skip2),
+                    // save the value of IsAllowed
+                    new CodeInstruction(OpCodes.Stloc_S, isAllowedUnlocking.LocalIndex).MoveLabelsFrom(newInstructions[index]),
 
                     // player
                     new(OpCodes.Ldloc_S, player.LocalIndex),
@@ -201,7 +195,6 @@ namespace Exiled.Events.Patches.Events.Player
                     // if (!ev.IsAllowed)
                     //    goto notAllowed;
                     new(OpCodes.Callvirt, PropertyGetter(typeof(UnlockingGeneratorEventArgs), nameof(UnlockingGeneratorEventArgs.IsAllowed))),
-                    new(OpCodes.Brfalse_S, notAllowed),
                 });
 
             offset = -5;
