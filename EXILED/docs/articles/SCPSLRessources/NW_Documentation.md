@@ -17,7 +17,7 @@
 title: NW Documentation
 ---
 
-Last Update (14.0.0.2)
+Last Update (14.0.0.3)
 
 ### Index
 
@@ -290,6 +290,7 @@ Last Update (14.0.0.2)
 - [SpectatorSpawnReason](#spectatorspawnreason)
 - [State](#state)
 - [States](#states)
+- [StatMessageType](#statmessagetype)
 - [StatusType](#statustype)
 - [SteamLobbyPrivacy](#steamlobbyprivacy)
 - [StorageLocation](#storagelocation)
@@ -1747,6 +1748,7 @@ Last Update (14.0.0.2)
  [2] = CuffedClassD
  [3] = Scientist
  [4] = CuffedScientist
+ [5] = Custom
 ```
 
 </details>
@@ -4636,6 +4638,17 @@ Last Update (14.0.0.2)
 
 </details>
 
+### StatMessageType
+
+<details><summary><b>PlayerStatsSystem.SyncedStatMessages+StatMessageType</b></summary>
+
+```
+ [0] = CurrentValue
+ [1] = MaxValue
+```
+
+</details>
+
 ### StatusType
 
 <details><summary><b>InventorySystem.Items.Usables.StatusMessage+StatusType</b></summary>
@@ -5200,7 +5213,7 @@ Last Update (14.0.0.2)
 
 <details><summary> <b>Damage Handlers</b></summary>
 
-```md title="Latest Updated: 14.0.0.2"
+```md title="Latest Updated: 14.0.0.3"
 All available DamageHandlers
 
 + Symbol ':' literally means "inherits from"
