@@ -51,6 +51,9 @@ namespace Exiled.Events.Patches.Events.Server
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
+            for (int z = 0; z < newInstructions.Count; z++)
+                Log.Info($"[{z}] {newInstructions[z].opcode} {newInstructions[z].operand} ({newInstructions[z].labels.Count})");
+
             const string LeadingTeam = "<leadingTeam>5__4";
             const string NewList = "<newList>5__3";
 
@@ -76,23 +79,35 @@ namespace Exiled.Events.Patches.Events.Server
 
             newInstructions[index].labels.Add(jmp);
 
+            // Round.LastClassList = this.newList;
+            offset = 1;
+            index = newInstructions.FindIndex(x => x.opcode == OpCodes.Stfld && x.operand == (object)Field(typeof(SumInfo_ClassList), nameof(SumInfo_ClassList.warhead_kills))) + offset;
+            newInstructions.InsertRange(index, new CodeInstruction[]
+            {
+                new(OpCodes.Ldarg_0),
+                new(OpCodes.Ldfld, Field(PrivateType, NewList)),
+                new(OpCodes.Call, PropertySetter(typeof(Round), nameof(Round.LastClassList))),
+            });
+
             // Get the whole leadingteam logic
             offset = -20;
             index = newInstructions.FindIndex(x => x.StoresField(Field(PrivateType, LeadingTeam))) + offset;
-            int offset2 = 1;
-            int index2 = newInstructions.FindLastIndex(x => x.StoresField(Field(PrivateType, LeadingTeam))) + offset2;
+            int offset2 = -1;
+            int index2 = newInstructions.FindIndex(x => x.LoadsField(Field(PrivateType, LeadingTeam))) + offset2;
             List<CodeInstruction> leadingTeamLogic = newInstructions.GetRange(index, index2 - index);
             List<Label> moveLabel = newInstructions[index2].ExtractLabels();
             newInstructions.RemoveRange(index, index2 - index);
 
             // put the LeadingTeam logic before the event
             offset = -1;
-            index = newInstructions.FindLastIndex(x => x.operand is LocalBuilder { LocalIndex: 10 }) + offset;
+            index = newInstructions.FindIndex(x => x.StoresField(Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded)))) + offset;
+
             newInstructions.InsertRange(index, leadingTeamLogic);
 
             // recorect the index because of the LeadingTeamLogic that got moved
             offset = -1;
-            index = newInstructions.FindLastIndex(x => x.operand is LocalBuilder { LocalIndex: 10 }) + offset;
+            index = newInstructions.FindIndex(x => x.StoresField(Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded)))) + offset;
+
             LocalBuilder evEndingRound = generator.DeclareLocal(typeof(EndingRoundEventArgs));
 
             newInstructions.InsertRange(
@@ -107,8 +122,8 @@ namespace Exiled.Events.Patches.Events.Server
                     new(OpCodes.Ldarg_0),
                     new(OpCodes.Ldfld, Field(PrivateType, NewList)),
 
-                    // baseGameConditionsSatisfied
-                    new(OpCodes.Ldloc_S, 10),
+                    // RoundSummary._roundEnded
+                    new(OpCodes.Ldfld, Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded))),
 
                     // EndingRoundEventArgs evEndingRound = new(LeadingTeam, RoundSummary.SumInfo_ClassList, bool);
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(EndingRoundEventArgs))[0]),
@@ -118,10 +133,10 @@ namespace Exiled.Events.Patches.Events.Server
                     new(OpCodes.Call, Method(typeof(Handlers.Server), nameof(Handlers.Server.OnEndingRound))),
                     new(OpCodes.Stloc_S, evEndingRound.LocalIndex),
 
-                    // flag = ev.IsAllowed
+                    // RoundSummary._roundEnded = ev.IsAllowed
                     new(OpCodes.Ldloc_S, evEndingRound.LocalIndex),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(EndingRoundEventArgs), nameof(EndingRoundEventArgs.IsAllowed))),
-                    new(OpCodes.Stloc_S, 10),
+                    new(OpCodes.Stfld, Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded))),
 
                     // this.LeadingTeam = ev.LeadingTeam
                     new(OpCodes.Ldarg_0),
@@ -129,16 +144,6 @@ namespace Exiled.Events.Patches.Events.Server
                     new(OpCodes.Callvirt, PropertyGetter(typeof(EndingRoundEventArgs), nameof(EndingRoundEventArgs.LeadingTeam))),
                     new(OpCodes.Stfld, Field(PrivateType, LeadingTeam)),
                 });
-
-            // Round.LastClassList = this.newList;
-            offset = 1;
-            index = newInstructions.FindIndex(x => x.opcode == OpCodes.Stfld && x.operand == (object)Field(typeof(SumInfo_ClassList), nameof(SumInfo_ClassList.warhead_kills))) + offset;
-            newInstructions.InsertRange(index, new CodeInstruction[]
-            {
-                new(OpCodes.Ldarg_0),
-                new(OpCodes.Ldfld, Field(PrivateType, NewList)),
-                new(OpCodes.Call, PropertySetter(typeof(Round), nameof(Round.LastClassList))),
-            });
 
             Label skip = generator.DefineLabel();
 
@@ -161,7 +166,7 @@ namespace Exiled.Events.Patches.Events.Server
                     // timeToRestart
                     new(OpCodes.Ldloc_S, timeToRestartIndex),
 
-                    // RoundEndedEventArgs evEndedRound = new(RoundSummary.LeadingTeam, RoundSummary.SumInfo_ClassList, bool);
+                    // RoundEndedEventArgs evEndedRound = new(RoundSummary.LeadingTeam, RoundSummary.SumInfo_ClassList, int);
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(RoundEndedEventArgs))[0]),
                     new(OpCodes.Dup),
                     new(OpCodes.Dup),

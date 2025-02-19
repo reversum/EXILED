@@ -7,6 +7,8 @@
 
 namespace Exiled.Events.EventArgs.Server
 {
+    using System;
+
     using API.Enums;
     using Interfaces;
 
@@ -47,10 +49,11 @@ namespace Exiled.Events.EventArgs.Server
         /// <summary>
         /// Gets or sets a value indicating whether the round is ended by API call.
         /// </summary>
+        [Obsolete("This event is now call only when it's haven't been force eneded")]
         public bool IsForceEnded
         {
-            get => RoundSummary.singleton._roundEnded;
-            set => RoundSummary.singleton._roundEnded = value;
+            get => false; // This event is now call only when ForceEnd method haven't been called
+            set => IsAllowed = value;
         }
 
         /// <summary>
