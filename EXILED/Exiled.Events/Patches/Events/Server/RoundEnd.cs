@@ -51,9 +51,6 @@ namespace Exiled.Events.Patches.Events.Server
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
-            for (int z = 0; z < newInstructions.Count; z++)
-                Log.Info($"[{z}] {newInstructions[z].opcode} {newInstructions[z].operand} ({newInstructions[z].labels.Count})");
-
             const string LeadingTeam = "<leadingTeam>5__4";
             const string NewList = "<newList>5__3";
 
