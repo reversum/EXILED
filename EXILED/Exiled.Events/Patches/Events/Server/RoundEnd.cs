@@ -96,14 +96,13 @@ namespace Exiled.Events.Patches.Events.Server
             newInstructions.RemoveRange(index, index2 - index);
 
             // put the LeadingTeam logic before the event
-            offset = -1;
+            offset = 1;
             index = newInstructions.FindIndex(x => x.StoresField(Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded)))) + offset;
 
             newInstructions.InsertRange(index, leadingTeamLogic);
 
             // recorect the index because of the LeadingTeamLogic that got moved
-            offset = -1;
-            index = newInstructions.FindIndex(x => x.StoresField(Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded)))) + offset;
+            index = leadingTeamLogic.Count + index;
 
             LocalBuilder evEndingRound = generator.DeclareLocal(typeof(EndingRoundEventArgs));
 
@@ -119,7 +118,8 @@ namespace Exiled.Events.Patches.Events.Server
                     new(OpCodes.Ldarg_0),
                     new(OpCodes.Ldfld, Field(PrivateType, NewList)),
 
-                    // RoundSummary._roundEnded
+                    // this._roundEnded
+                    new(OpCodes.Ldarg_0),
                     new(OpCodes.Ldfld, Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded))),
 
                     // EndingRoundEventArgs evEndingRound = new(LeadingTeam, RoundSummary.SumInfo_ClassList, bool);
@@ -130,7 +130,8 @@ namespace Exiled.Events.Patches.Events.Server
                     new(OpCodes.Call, Method(typeof(Handlers.Server), nameof(Handlers.Server.OnEndingRound))),
                     new(OpCodes.Stloc_S, evEndingRound.LocalIndex),
 
-                    // RoundSummary._roundEnded = ev.IsAllowed
+                    // this._roundEnded = ev.IsAllowed
+                    new(OpCodes.Ldarg_0),
                     new(OpCodes.Ldloc_S, evEndingRound.LocalIndex),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(EndingRoundEventArgs), nameof(EndingRoundEventArgs.IsAllowed))),
                     new(OpCodes.Stfld, Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded))),
