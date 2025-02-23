@@ -162,13 +162,9 @@ namespace Exiled.Events.Patches.Events.Player
                     new CodeInstruction(OpCodes.Nop).WithLabels(skip),
                 });
 
-            offset = -5;
+            offset = -6;
             index = newInstructions.FindLastIndex(instruction => instruction.Calls(Method(typeof(Scp079Generator), nameof(Scp079Generator.RpcDenied)))) + offset;
 
-            newInstructions.RemoveRange(index, 7);
-
-            offset = -3;
-            index = newInstructions.FindLastIndex(x => x.operand == (object)Field(typeof(Scp079Generator), nameof(Scp079Generator._unlockCooldownTime))) + offset;
             newInstructions.InsertRange(
                 index,
                 new[]
