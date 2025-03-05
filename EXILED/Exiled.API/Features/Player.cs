@@ -137,7 +137,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets a list of all <see cref="Player"/>'s on the server.
         /// </summary>
-        public static IReadOnlyCollection<Player> List => Dictionary.Values.Where(x => !x.IsNPC).ToList();
+        public static IReadOnlyCollection<Player> List => Dictionary.Values.ToList();
 
         /// <summary>
         /// Gets a <see cref="Dictionary{TKey, TValue}"/> containing cached <see cref="Player"/> and their user ids.
@@ -2911,6 +2911,26 @@ namespace Exiled.API.Features
             });
 
             return true;
+        }
+
+        /// <summary>
+        /// Removes specific candy from the players <see cref="Scp330"/>.
+        /// </summary>
+        /// <param name="candyType">The <see cref="CandyKindID"/> to remove.</param>
+        /// <param name="removeAll">Remove all candy of that type.</param>
+        /// <returns><see langword="true"/> if a candy was removed.</returns>
+        public bool TryRemoveCandу(CandyKindID candyType, bool removeAll = false)
+        {
+            foreach (Item item in Items)
+            {
+                if (item is not Scp330 bag)
+                    continue;
+
+                if (bag.RemoveCandy(candyType, removeAll) > 0)
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>
