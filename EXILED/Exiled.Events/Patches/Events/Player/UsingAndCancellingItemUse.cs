@@ -117,7 +117,7 @@ namespace Exiled.Events.Patches.Events.Player
             offset = 3;
             index = newInstructions.FindLastIndex(
                 instruction => instruction.Calls(Method(typeof(NetworkUtils), nameof(NetworkUtils.SendToAuthenticated)))) + offset;
-
+            /* // TODO: FIX THE CRASH ISSUE
             newInstructions.InsertRange(
                 index,
                 new[]
@@ -135,7 +135,7 @@ namespace Exiled.Events.Patches.Events.Player
 
                     // Handlers.Player.OnCancellingItemUse(ev)
                     new(OpCodes.Call, Method(typeof(Handlers.Player), nameof(Handlers.Player.OnCancelledItemUse))),
-                });
+                });*/
 
             newInstructions[newInstructions.Count - 1].WithLabels(returnLabel);
 
