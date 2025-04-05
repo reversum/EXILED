@@ -35,7 +35,7 @@ namespace Exiled.Events.Patches.Generic
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(codeInstructions);
 
             int offset = -3;
-            int index = newInstructions.FindIndex(i => i.Calls(Method(typeof(RoomIdUtils), nameof(RoomIdUtils.PositionToCoords)))) + offset;
+            int index = newInstructions.FindIndex(i => i.Calls(Method(typeof(RoomUtils), nameof(RoomUtils.PositionToCoords)))) + offset;
 
             // Room.Get(gameObject).InternalCreate();
             newInstructions.InsertRange(

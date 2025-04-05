@@ -73,7 +73,7 @@ namespace Exiled.Events.Patches.Events.Map
                     continue;
                 if (!IndividualFriendlyFire.CheckFriendlyFirePlayer(instance.PreviousOwner, player.ReferenceHub) && !instance.PreviousOwner.CompareLife(player.ReferenceHub))
                     continue;
-                if (Physics.Linecast(instance.transform.position, player.CameraTransform.position, instance._blindingMask))
+                if (Physics.Linecast(instance.transform.position, player.CameraTransform.position, instance.BlindingMask))
                     continue;
 
                 targetToAffect.Add(player);
