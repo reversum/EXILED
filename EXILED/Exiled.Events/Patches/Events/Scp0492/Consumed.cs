@@ -52,7 +52,7 @@ namespace Exiled.Events.Patches.Events.Scp0492
                     new CodeInstruction(OpCodes.Ldarg_0),
                     new(OpCodes.Call, PropertyGetter(typeof(RagdollAbilityBase<ZombieRole>), nameof(RagdollAbilityBase<ZombieRole>.CurRagdoll))),
 
-                    // ConsumingCorpseEventArgs ev = new(ReferenceHub, Ragdoll, bool)
+                    // ConsumingCorpseEventArgs ev = new(ReferenceHub, Ragdoll)
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(ConsumedCorpseEventArgs))[0]),
                     new(OpCodes.Dup),
                     new(OpCodes.Stloc_S, ev.LocalIndex),
@@ -62,7 +62,7 @@ namespace Exiled.Events.Patches.Events.Scp0492
                 });
 
             // replace "Scp0492ConsumingCorpseEventArgs(base.Owner, base.CurRagdoll, 100f);" with "Scp0492ConsumingCorpseEventArgs(base.Owner, base.CurRagdoll, ev.ConsumeHeal);"
-            int offset = -1;
+            int offset = 0;
             int index = newInstructions.FindIndex(x => x.opcode == OpCodes.Ldc_R4 && (float)x.operand == ZombieConsumeAbility.ConsumeHeal) + offset;
             newInstructions.RemoveAt(index);
 
