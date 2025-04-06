@@ -61,10 +61,9 @@ namespace Exiled.Events.Patches.Events.Map
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
-            int offset = 2;
-            int index = newInstructions.FindIndex(i => i.opcode == OpCodes.Ldloc_S && i.operand is LocalBuilder { LocalIndex: 5 }) + offset;
+            int offset = 1;
+            int index = newInstructions.FindIndex(i => i.opcode == OpCodes.Stloc_S && i.operand is LocalBuilder { LocalIndex: 5 }) + offset;
 
-            Log.Warn($"INDEX OF EXPLODING GRENADE: {index}");
             Label continueLabel = generator.DefineLabel();
 
             LocalBuilder ev = generator.DeclareLocal(typeof(ExplodingGrenadeEventArgs));
@@ -119,9 +118,6 @@ namespace Exiled.Events.Patches.Events.Map
                 new(OpCodes.Call, Method(typeof(ExplodingFragGrenade), nameof(TrimColliders))),
                 new(OpCodes.Stloc_S, 5),
             });
-
-            for (int z = 0; z < newInstructions.Count; z++)
-                Log.Info($"[{z}]{newInstructions[z].opcode} : {newInstructions[z].operand}  ({newInstructions[z].labels.Count})");
 
             for (int z = 0; z < newInstructions.Count; z++)
                 yield return newInstructions[z];
