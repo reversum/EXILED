@@ -32,5 +32,10 @@ namespace Exiled.API.Enums
         /// Speaker toy.
         /// </summary>
         Speaker,
+
+        /// <summary>
+        /// Capybara toy.
+        /// </summary>
+        Capybara,
     }
 }

@@ -336,5 +336,14 @@ namespace Exiled.API.Enums
 
         [Prefab(912031041, "ElevatorChamberNuke")]
         ElevatorChamberNuke,
+
+        [Prefab(3087007600, "CapybaraToy")]
+        CapybaraToy,
+
+        [Prefab(3539746802, "Sinkhole")]
+        Sinkhole,
+
+        [Prefab(1548138668, "AutoRagdoll")]
+        AutoRagdoll,
     }
 }
