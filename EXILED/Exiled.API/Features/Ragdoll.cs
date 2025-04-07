@@ -145,7 +145,16 @@ namespace Exiled.API.Features
         public string Nickname
         {
             get => NetworkInfo.Nickname;
-            set => NetworkInfo = new(NetworkInfo.OwnerHub, NetworkInfo.Handler, NetworkInfo.RoleType, NetworkInfo.StartPosition, NetworkInfo.StartRotation, value, NetworkInfo.CreationTime);
+            set => NetworkInfo = new(NetworkInfo.OwnerHub, NetworkInfo.Handler, NetworkInfo.RoleType, NetworkInfo.StartPosition, NetworkInfo.StartRotation, NetworkInfo.Scale, value, NetworkInfo.CreationTime);
+        }
+
+        /// <summary>
+        /// Gets or sets the ragdoll's Scale with RagdollData.
+        /// </summary>
+        public Vector3 Scale
+        {
+            get => NetworkInfo.Scale;
+            set => NetworkInfo = new(NetworkInfo.OwnerHub, NetworkInfo.Handler, NetworkInfo.RoleType, NetworkInfo.StartPosition, NetworkInfo.StartRotation, value, NetworkInfo.Nickname, NetworkInfo.CreationTime);
         }
 
         /// <summary>
@@ -248,9 +257,9 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Gets or sets the ragdoll's scale.
+        /// Gets or sets the ragdoll's as Gameobjectscale.
         /// </summary>
-        public Vector3 Scale
+        public Vector3 RagdollScale
         {
             get => Base.transform.localScale;
             set

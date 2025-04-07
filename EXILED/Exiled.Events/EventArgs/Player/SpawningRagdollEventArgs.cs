@@ -63,13 +63,13 @@ namespace Exiled.Events.EventArgs.Player
         public Vector3 Scale
         {
             get => Info.Scale;
-            set => Info = new RagdollData(Player.ReferenceHub, DamageHandlerBase, Role, Position, Rotation, value, Nickname, CreationTime);
+            set => Info = new RagdollData(Player.ReferenceHub, DamageHandlerBase, Role, Position, Rotation, Vector3.Scale(value, RagdollManager.GetDefaultScale(Role)), Nickname, CreationTime);
         }
 
         /// <summary>
         /// Gets or sets the ragdoll's scale with GameObject.
         /// </summary>
-        public Vector3 RagdollScale { get; set; }
+        public Vector3 RagdollScale { get; set; } = Vector3.one;
 
         /// <summary>
         /// Gets or sets the ragdoll's <see cref="RoleTypeId" />.
