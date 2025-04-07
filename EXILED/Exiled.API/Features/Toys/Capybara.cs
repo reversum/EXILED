@@ -7,14 +7,9 @@
 
 namespace Exiled.API.Features.Toys
 {
-    using System.Collections.Generic;
-
     using AdminToys;
     using Enums;
     using Exiled.API.Interfaces;
-    using UnityEngine;
-    using VoiceChat.Networking;
-    using VoiceChat.Playbacks;
 
     /// <summary>
     /// A wrapper class for <see cref="CapybaraToy"/>.
