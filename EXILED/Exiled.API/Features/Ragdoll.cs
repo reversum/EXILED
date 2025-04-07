@@ -101,7 +101,7 @@ namespace Exiled.API.Features
         public DamageHandlerBase DamageHandler
         {
             get => NetworkInfo.Handler;
-            set => NetworkInfo = new(NetworkInfo.OwnerHub, value, NetworkInfo.RoleType, NetworkInfo.StartPosition, NetworkInfo.StartRotation, NetworkInfo.Nickname, NetworkInfo.CreationTime);
+            set => NetworkInfo = new(NetworkInfo.OwnerHub, value, NetworkInfo.RoleType, NetworkInfo.StartPosition, NetworkInfo.StartRotation, NetworkInfo.Scale, NetworkInfo.Nickname, NetworkInfo.CreationTime);
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Exiled.API.Features
         public Player Owner
         {
             get => Player.Get(NetworkInfo.OwnerHub);
-            set => NetworkInfo = new(value.ReferenceHub, NetworkInfo.Handler, NetworkInfo.RoleType, NetworkInfo.StartPosition, NetworkInfo.StartRotation, NetworkInfo.Nickname, NetworkInfo.CreationTime);
+            set => NetworkInfo = new(value.ReferenceHub, NetworkInfo.Handler, NetworkInfo.RoleType, NetworkInfo.StartPosition, NetworkInfo.StartRotation, NetworkInfo.Scale, NetworkInfo.Nickname, NetworkInfo.CreationTime);
         }
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace Exiled.API.Features
             set
             {
                 float creationTime = (float)(NetworkTime.time - (DateTime.Now - value).TotalSeconds);
-                NetworkInfo = new RagdollData(NetworkInfo.OwnerHub, NetworkInfo.Handler, NetworkInfo.RoleType, NetworkInfo.StartPosition, NetworkInfo.StartRotation, NetworkInfo.Nickname, creationTime);
+                NetworkInfo = new RagdollData(NetworkInfo.OwnerHub, NetworkInfo.Handler, NetworkInfo.RoleType, NetworkInfo.StartPosition, NetworkInfo.StartRotation, NetworkInfo.Scale, NetworkInfo.Nickname, creationTime);
             }
         }
 
@@ -190,7 +190,7 @@ namespace Exiled.API.Features
         public RoleTypeId Role
         {
             get => NetworkInfo.RoleType;
-            set => NetworkInfo = new(NetworkInfo.OwnerHub, NetworkInfo.Handler, value, NetworkInfo.StartPosition, NetworkInfo.StartRotation, NetworkInfo.Nickname, NetworkInfo.CreationTime);
+            set => NetworkInfo = new(NetworkInfo.OwnerHub, NetworkInfo.Handler, value, NetworkInfo.StartPosition, NetworkInfo.StartRotation, NetworkInfo.Scale, NetworkInfo.Nickname, NetworkInfo.CreationTime);
         }
 
         /// <summary>
