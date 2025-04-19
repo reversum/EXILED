@@ -17,7 +17,7 @@
 title: NW Documentation
 ---
 
-Last Update (14.0.0.0)
+Last Update (14.0.0.3)
 
 ### Index
 
@@ -46,6 +46,7 @@ Last Update (14.0.0.0)
 - [Authorization](#authorization)
 - [AutoHideType](#autohidetype)
 - [AutosyncInstantiationStatus](#autosyncinstantiationstatus)
+- [AutosyncMessageType](#autosyncmessagetype)
 - [BadgePreferences](#badgepreferences)
 - [BadgeVisibilityPreferences](#badgevisibilitypreferences)
 - [BanType](#bantype)
@@ -150,7 +151,7 @@ Last Update (14.0.0.0)
 - [HintTranslations](#hinttranslations)
 - [HintType](#hinttype)
 - [HitboxType](#hitboxtype)
-- [Holidays](#holidays)
+- [HolidayType](#holidaytype)
 - [HotkeysTranslation](#hotkeystranslation)
 - [HttpQueryMode](#httpquerymode)
 - [IcomText](#icomtext)
@@ -181,8 +182,8 @@ Last Update (14.0.0.0)
 - [MapGenerationPhase](#mapgenerationphase)
 - [MappingLifetime](#mappinglifetime)
 - [MessageHeader](#messageheader)
-- [MessageHeader](#messageheader)
 - [MessageImportance](#messageimportance)
+- [MessageInterceptionResult](#messageinterceptionresult)
 - [MessageType](#messagetype)
 - [MessageType](#messagetype)
 - [MicroHidFiringMode](#microhidfiringmode)
@@ -230,6 +231,7 @@ Last Update (14.0.0.0)
 - [RadioCommand](#radiocommand)
 - [RadioRangeLevel](#radiorangelevel)
 - [RejectionReason](#rejectionreason)
+- [ReloaderMessageHeader](#reloadermessageheader)
 - [RemoteAdminResponseFlags](#remoteadminresponseflags)
 - [RemovalMode](#removalmode)
 - [ReproProjectAssetType](#reproprojectassettype)
@@ -243,8 +245,8 @@ Last Update (14.0.0.0)
 - [RoomShape](#roomshape)
 - [RootCullablePriority](#rootcullablepriority)
 - [RoundRestartType](#roundrestarttype)
-- [RpcHeader](#rpcheader)
 - [RpcStateMsg](#rpcstatemsg)
+- [RpcType](#rpctype)
 - [RpcType](#rpctype)
 - [RpcType](#rpctype)
 - [RpcType](#rpctype)
@@ -288,6 +290,7 @@ Last Update (14.0.0.0)
 - [SpectatorSpawnReason](#spectatorspawnreason)
 - [State](#state)
 - [States](#states)
+- [StatMessageType](#statmessagetype)
 - [StatusType](#statustype)
 - [SteamLobbyPrivacy](#steamlobbyprivacy)
 - [StorageLocation](#storagelocation)
@@ -780,6 +783,18 @@ Last Update (14.0.0.0)
  [1] = Template
  [2] = InventoryInstance
  [3] = SimulatedInstance
+```
+
+</details>
+
+### AutosyncMessageType
+
+<details><summary><b>InventorySystem.Items.Autosync.AutosyncMessageType</b></summary>
+
+```
+ [0] = RpcInstance
+ [1] = RpcTemplate
+ [2] = Cmd
 ```
 
 </details>
@@ -1601,10 +1616,10 @@ Last Update (14.0.0.0)
 <details><summary><b>CustomPlayerEffects.StatusEffectBase+EffectClassification</b></summary>
 
 ```
- [0] = Negative
- [1] = Mixed
- [2] = Positive
- [3] = Technical
+ [0] = Technical
+ [1] = Negative
+ [2] = Mixed
+ [3] = Positive
 ```
 
 </details>
@@ -1733,6 +1748,7 @@ Last Update (14.0.0.0)
  [2] = CuffedClassD
  [3] = Scientist
  [4] = CuffedScientist
+ [5] = Custom
 ```
 
 </details>
@@ -2004,6 +2020,10 @@ Last Update (14.0.0.0)
  [5] = Nuke
  [6] = Scp244
  [7] = BecomingFlamingo
+ [8] = HalloweenInside
+ [9] = HalloweenOutside
+ [10] = ChristmasInside
+ [11] = ChristmasOutside
 ```
 
 </details>
@@ -2292,20 +2312,15 @@ Last Update (14.0.0.0)
 
 </details>
 
-### Holidays
+### HolidayType
 
-<details><summary><b>Holidays</b></summary>
+<details><summary><b>MapGeneration.Holidays.HolidayType</b></summary>
 
 ```
- [0] = NoHoliday
- [1] = Halloween
- [2] = Christmas
+ [0] = None
+ [1] = Christmas
+ [2] = Halloween
  [3] = AprilFools
- [4] = October
- [5] = December
- [6] = FirstHalfOfApril
- [7] = OctoberOrDecember
- [-1] = Always
 ```
 
 </details>
@@ -2863,20 +2878,6 @@ Last Update (14.0.0.0)
 
 ### MessageHeader
 
-<details><summary><b>InventorySystem.Items.Firearms.Modules.AnimatorReloaderModuleBase+MessageHeader</b></summary>
-
-```
- [0] = Custom
- [1] = Reload
- [2] = Unload
- [3] = Stop
- [4] = RequestRejected
-```
-
-</details>
-
-### MessageHeader
-
 <details><summary><b>InventorySystem.Items.Firearms.Modules.AutomaticActionModule+MessageHeader</b></summary>
 
 ```
@@ -2899,6 +2900,18 @@ Last Update (14.0.0.0)
  [2] = Normal
  [3] = LessImportant
  [4] = LeastImportant
+```
+
+</details>
+
+### MessageInterceptionResult
+
+<details><summary><b>InventorySystem.Items.Autosync.MessageInterceptionResult</b></summary>
+
+```
+ [0] = Continue
+ [1] = ResetAndContinue
+ [2] = Stop
 ```
 
 </details>
@@ -3646,6 +3659,20 @@ Last Update (14.0.0.0)
 
 </details>
 
+### ReloaderMessageHeader
+
+<details><summary><b>InventorySystem.Items.Firearms.Modules.AnimatorReloaderModuleBase+ReloaderMessageHeader</b></summary>
+
+```
+ [0] = Reload
+ [1] = Unload
+ [2] = Stop
+ [3] = RequestRejected
+ [4] = Custom
+```
+
+</details>
+
 ### RemoteAdminResponseFlags
 
 <details><summary><b>RemoteAdminResponse+RemoteAdminResponseFlags</b></summary>
@@ -3877,17 +3904,6 @@ Last Update (14.0.0.0)
 
 </details>
 
-### RpcHeader
-
-<details><summary><b>InventorySystem.Items.Firearms.Modules.AnimationToggleableReloaderModule+RpcHeader</b></summary>
-
-```
- [0] = SyncLoadable
- [1] = Cancel
-```
-
-</details>
-
 ### RpcStateMsg
 
 <details><summary><b>PlayerRoles.PlayableScps.Scp939.Mimicry.MimicPointController+RpcStateMsg</b></summary>
@@ -3970,6 +3986,17 @@ Last Update (14.0.0.0)
  [0] = AttackStart
  [1] = Hit
  [2] = Holster
+```
+
+</details>
+
+### RpcType
+
+<details><summary><b>InventorySystem.Items.Firearms.Modules.AnimationToggleableReloaderModule+RpcType</b></summary>
+
+```
+ [0] = LoadableAmmoSync
+ [1] = StopAnimations
 ```
 
 </details>
@@ -4611,6 +4638,17 @@ Last Update (14.0.0.0)
 
 </details>
 
+### StatMessageType
+
+<details><summary><b>PlayerStatsSystem.SyncedStatMessages+StatMessageType</b></summary>
+
+```
+ [0] = CurrentValue
+ [1] = MaxValue
+```
+
+</details>
+
 ### StatusType
 
 <details><summary><b>InventorySystem.Items.Usables.StatusMessage+StatusType</b></summary>
@@ -5175,7 +5213,7 @@ Last Update (14.0.0.0)
 
 <details><summary> <b>Damage Handlers</b></summary>
 
-```md title="Latest Updated: 14.0.0.0"
+```md title="Latest Updated: 14.0.0.3"
 All available DamageHandlers
 
 + Symbol ':' literally means "inherits from"

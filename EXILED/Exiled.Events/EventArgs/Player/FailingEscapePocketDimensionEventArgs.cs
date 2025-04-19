@@ -7,6 +7,8 @@
 
 namespace Exiled.Events.EventArgs.Player
 {
+    using System;
+
     using API.Features;
 
     using Interfaces;
@@ -19,19 +21,19 @@ namespace Exiled.Events.EventArgs.Player
         /// <summary>
         /// Initializes a new instance of the <see cref="FailingEscapePocketDimensionEventArgs" /> class.
         /// </summary>
+        /// <param name="pocketDimensionTeleport">
+        /// <inheritdoc cref="Teleporter" />
+        /// </param>
         /// <param name="player">
         /// <inheritdoc cref="Player" />
-        /// </param>
-        /// <param name="teleporter">
-        /// <inheritdoc cref="Teleporter" />
         /// </param>
         /// <param name="isAllowed">
         /// <inheritdoc cref="IsAllowed" />
         /// </param>
-        public FailingEscapePocketDimensionEventArgs(Player player, PocketDimensionTeleport teleporter, bool isAllowed = true)
+        public FailingEscapePocketDimensionEventArgs(PocketDimensionTeleport pocketDimensionTeleport, Player player, bool isAllowed = true)
         {
+            Teleporter = pocketDimensionTeleport;
             Player = player;
-            Teleporter = teleporter;
             IsAllowed = isAllowed;
         }
 

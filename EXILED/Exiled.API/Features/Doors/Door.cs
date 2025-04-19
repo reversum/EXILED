@@ -357,7 +357,7 @@ namespace Exiled.API.Features.Doors
         /// </summary>
         /// <param name="gameObject">The base-game <see cref="UnityEngine.GameObject"/>.</param>
         /// <returns>The <see cref="Door"/> with the given name or <see langword="null"/> if not found.</returns>
-        public static Door Get(GameObject gameObject) => gameObject is null ? null : Get(gameObject.GetComponentInChildren<DoorVariant>());
+        public static Door Get(GameObject gameObject) => gameObject is null ? null : Get(gameObject.GetComponentInParent<DoorVariant>());
 
         /// <summary>
         /// Returns the closest <see cref="Door"/> to the given <paramref name="position"/>.
@@ -627,14 +627,19 @@ namespace Exiled.API.Features.Doors
                 // Doors contains the DoorNameTagExtension component
                 "CHECKPOINT_LCZ_A" => DoorType.CheckpointLczA,
                 "CHECKPOINT_LCZ_B" => DoorType.CheckpointLczB,
-                "CHECKPOINT_EZ_HCZ_A" => DoorType.CheckpointEzHczA,
+
+                // TODO: Remove when it's fix https://git.scpslgame.com/northwood-qa/scpsl-bug-reporting/-/issues/782
+                "CHECKPOINT_EZ_HCZ_A" => Room?.Type switch
+                {
+                    RoomType.HczEzCheckpointA => DoorType.CheckpointEzHczA,
+                    _ => DoorType.CheckpointEzHczB,
+                },
                 "CHECKPOINT_EZ_HCZ_B" => DoorType.CheckpointEzHczB,
                 "106_PRIMARY" => DoorType.Scp106Primary,
                 "106_SECONDARY" => DoorType.Scp106Secondary,
                 "ESCAPE_PRIMARY" => DoorType.EscapePrimary,
                 "ESCAPE_SECONDARY" => DoorType.EscapeSecondary,
                 "INTERCOM" => DoorType.Intercom,
-                "NUKE_ARMORY" => DoorType.NukeArmory,
                 "LCZ_ARMORY" => DoorType.LczArmory,
                 "SURFACE_NUKE" => DoorType.NukeSurface,
                 "HCZ_ARMORY" => DoorType.HczArmory,

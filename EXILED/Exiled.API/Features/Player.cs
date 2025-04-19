@@ -19,6 +19,7 @@ namespace Exiled.API.Features
     using DamageHandlers;
     using Enums;
     using Exiled.API.Features.Core.Interfaces;
+    using Exiled.API.Features.CustomStats;
     using Exiled.API.Features.Doors;
     using Exiled.API.Features.Hazards;
     using Exiled.API.Features.Items;
@@ -52,7 +53,6 @@ namespace Exiled.API.Features
     using PlayerRoles.Spectating;
     using PlayerRoles.Voice;
     using PlayerStatsSystem;
-    using PluginAPI.Core;
     using RelativePositioning;
     using RemoteAdmin;
     using Respawning.NamingRules;
@@ -95,7 +95,8 @@ namespace Exiled.API.Features
         private readonly HashSet<EActor> componentsInChildren = new();
 
         private ReferenceHub referenceHub;
-        private CustomHealthStat healthStat;
+        private HealthStat healthStat;
+        private CustomHumeShieldStat humeShieldStat;
         private Role role;
 
         /// <summary>
@@ -136,7 +137,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets a list of all <see cref="Player"/>'s on the server.
         /// </summary>
-        public static IReadOnlyCollection<Player> List => Dictionary.Values.Where(x => !x.IsNPC).ToList();
+        public static IReadOnlyCollection<Player> List => Dictionary.Values.ToList();
 
         /// <summary>
         /// Gets a <see cref="Dictionary{TKey, TValue}"/> containing cached <see cref="Player"/> and their user ids.
@@ -176,7 +177,8 @@ namespace Exiled.API.Features
                 Inventory = value.inventory;
                 CameraTransform = value.PlayerCameraReference;
 
-                value.playerStats._dictionarizedTypes[typeof(HealthStat)] = value.playerStats.StatModules[Array.IndexOf(PlayerStats.DefinedModules, typeof(HealthStat))] = healthStat = new CustomHealthStat { Hub = value };
+                healthStat = value.playerStats.StatModules[Array.IndexOf(PlayerStats.DefinedModules, typeof(HealthStat))] as HealthStat;
+                value.playerStats._dictionarizedTypes[typeof(HumeShieldStat)] = value.playerStats.StatModules[Array.IndexOf(PlayerStats.DefinedModules, typeof(HumeShieldStat))] = humeShieldStat = new CustomHumeShieldStat { Hub = value };
             }
         }
 
@@ -346,37 +348,9 @@ namespace Exiled.API.Features
             get => ReferenceHub.nicknameSync.Network_customPlayerInfoString;
             set
             {
-                // NW Client check.
-                if (value.Contains<char>('<'))
+                if (NicknameSync.ValidateCustomInfo(value, out string rejectionText))
                 {
-                    foreach (string token in value.Split('<'))
-                    {
-                        if (token.StartsWith("/", StringComparison.Ordinal) ||
-                            token.StartsWith("b>", StringComparison.Ordinal) ||
-                            token.StartsWith("i>", StringComparison.Ordinal) ||
-                            token.StartsWith("size=", StringComparison.Ordinal) ||
-                            token.Length is 0)
-                            continue;
-
-                        if (token.StartsWith("color=", StringComparison.Ordinal))
-                        {
-                            if (token.Length < 14 || token[13] != '>')
-                                Log.Error($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad text reject) \ntoken: {token} \nInfo: {value}");
-                            else if (!Misc.AllowedColors.ContainsValue(token.Substring(6, 7)))
-                                Log.Error($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad color reject) \ntoken: {token} \nInfo: {value}");
-                        }
-                        else if (token.StartsWith("#", StringComparison.Ordinal))
-                        {
-                            if (token.Length < 8 || token[7] != '>')
-                                Log.Error($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad text reject) \ntoken: {token} \nInfo: {value}");
-                            else if (!Misc.AllowedColors.ContainsValue(token.Substring(0, 7)))
-                                Log.Error($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad color reject) \ntoken: {token} \nInfo: {value}");
-                        }
-                        else
-                        {
-                            Log.Error($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad color reject) \ntoken: {token} \nInfo: {value}");
-                        }
-                    }
+                    Log.Error($"Could not set CustomInfo for {Nickname}. Reason: {rejectionText}");
                 }
 
                 InfoArea = string.IsNullOrEmpty(value) ? InfoArea & ~PlayerInfoArea.CustomInfo : InfoArea |= PlayerInfoArea.CustomInfo;
@@ -419,7 +393,7 @@ namespace Exiled.API.Features
         /// </summary>
         /// <seealso cref="GiveReservedSlot(bool)"/>
         /// <seealso cref="AddReservedSlot(string, bool)"/>
-        public bool HasReservedSlot => ReservedSlot.HasReservedSlot(UserId, out _);
+        public bool HasReservedSlot => ReservedSlot.HasReservedSlot(UserId);
 
         /// <summary>
         /// Gets a value indicating whether the player is in whitelist.
@@ -506,7 +480,7 @@ namespace Exiled.API.Features
         public virtual Vector3 Position
         {
             get => Transform.position;
-            set => ReferenceHub.TryOverridePosition(value, Vector3.zero);
+            set => ReferenceHub.TryOverridePosition(value);
         }
 
         /// <summary>
@@ -526,7 +500,7 @@ namespace Exiled.API.Features
         public Quaternion Rotation
         {
             get => Transform.rotation;
-            set => ReferenceHub.TryOverridePosition(Position, value.eulerAngles);
+            set => ReferenceHub.TryOverrideRotation(value.eulerAngles);
         }
 
         /// <summary>
@@ -610,18 +584,15 @@ namespace Exiled.API.Features
         /// <remarks>Players can be cuffed without another player being the cuffer.</remarks>
         public bool IsCuffed => Inventory.IsDisarmed();
 
-        // TODO NOT FINISH
-        /*
         /// <summary>
         /// Gets a value indicating whether the player is reloading a weapon.
         /// </summary>
-        public bool IsReloading => CurrentItem is Firearm firearm && !firearm.Base.AmmoManagerModule.Standby;
+        public bool IsReloading => CurrentItem is Firearm firearm && !firearm.IsReloading;
 
         /// <summary>
         /// Gets a value indicating whether the player is aiming with a weapon.
         /// </summary>
         public bool IsAimingDownWeapon => CurrentItem is Firearm firearm && firearm.Aiming;
-        */
 
         /// <summary>
         /// Gets a value indicating whether the player has enabled weapon's flashlight module.
@@ -792,7 +763,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets a value indicating whether the player is speaking.
         /// </summary>
-        public bool IsSpeaking => Role is Roles.IVoiceRole voiceRole && voiceRole.VoiceModule.IsSpeaking;
+        public bool IsSpeaking => Role is Roles.IVoiceRole voiceRole && voiceRole.VoiceModule.ServerIsSending;
 
         /// <summary>
         /// Gets the player's voice color.
@@ -883,7 +854,7 @@ namespace Exiled.API.Features
         public float MaxHealth
         {
             get => healthStat.MaxValue;
-            set => healthStat.CustomMaxValue = value;
+            set => healthStat.MaxValue = value;
         }
 
         /// <summary>
@@ -934,14 +905,33 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
+        /// Gets or sets the players maximum Hume Shield.
+        /// </summary>
+        public float MaxHumeShield
+        {
+            get => humeShieldStat.MaxValue;
+            set => humeShieldStat.MaxValue = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the players multiplier for gaining HumeShield.
+        /// </summary>
+        public float HumeShieldRegenerationMultiplier
+        {
+            get => humeShieldStat.ShieldRegenerationMultiplier;
+            set => humeShieldStat.ShieldRegenerationMultiplier = value;
+        }
+
+        /// <summary>
         /// Gets a <see cref="IEnumerable{T}"/> of all active Artificial Health processes on the player.
         /// </summary>
         public IEnumerable<AhpStat.AhpProcess> ActiveArtificialHealthProcesses => ReferenceHub.playerStats.GetModule<AhpStat>()._activeProcesses;
 
         /// <summary>
         /// Gets the player's <see cref="PlayerStatsSystem.HumeShieldStat"/>.
+        /// TODO: Change to <see cref="CustomHumeShieldStat"/>.
         /// </summary>
-        public HumeShieldStat HumeShieldStat => ReferenceHub.playerStats.GetModule<HumeShieldStat>();
+        public HumeShieldStat HumeShieldStat => humeShieldStat;
 
         /// <summary>
         /// Gets or sets the item in the player's hand. Value will be <see langword="null"/> if the player is not holding anything.
@@ -995,8 +985,8 @@ namespace Exiled.API.Features
         /// </summary>
         public string GroupName
         {
-            get => ServerStatic.PermissionsHandler._members.TryGetValue(UserId, out string groupName) ? groupName : null;
-            set => ServerStatic.PermissionsHandler._members[UserId] = value;
+            get => ServerStatic.PermissionsHandler.Members.TryGetValue(UserId, out string groupName) ? groupName : null;
+            set => ServerStatic.PermissionsHandler.Members[UserId] = value;
         }
 
         /// <summary>
@@ -1163,11 +1153,18 @@ namespace Exiled.API.Features
         internal static ConditionalWeakTable<GameObject, Player> UnverifiedPlayers { get; } = new();
 
         /// <summary>
-        /// Converts NwPluginAPI player to EXILED player.
+        /// Converts LabApi player to EXILED player.
         /// </summary>
-        /// <param name="player">The NwPluginAPI player.</param>
+        /// <param name="player">The LabApi player.</param>
         /// <returns>EXILED player.</returns>
-        public static implicit operator Player(PluginAPI.Core.Player player) => Get(player);
+        public static implicit operator Player(LabApi.Features.Wrappers.Player player) => Get(player);
+
+        /// <summary>
+        /// Converts LabApi player to EXILED player.
+        /// </summary>
+        /// <param name="player">The LabApi player.</param>
+        /// <returns>EXILED player.</returns>
+        public static implicit operator LabApi.Features.Wrappers.Player(Player player) => LabApi.Features.Wrappers.Player.Get(player.ReferenceHub);
 
         /// <summary>
         /// Gets a <see cref="Player"/> <see cref="IEnumerable{T}"/> filtered by side. Can be empty.
@@ -1358,11 +1355,11 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Gets the <see cref="Player"/> from NwPluginAPI class.
+        /// Gets the <see cref="Player"/> from LabApi class.
         /// </summary>
-        /// <param name="apiPlayer">The <see cref="PluginAPI.Core.Player"/> class.</param>
+        /// <param name="apiPlayer">The <see cref="LabApi.Features.Wrappers.Player"/> class.</param>
         /// <returns>A <see cref="Player"/> or <see langword="null"/> if not found.</returns>
-        public static Player Get(PluginAPI.Core.Player apiPlayer) => Get(apiPlayer.ReferenceHub);
+        public static Player Get(LabApi.Features.Wrappers.Player apiPlayer) => Get(apiPlayer.ReferenceHub);
 
         /// <summary>
         /// Try-get a player given a <see cref="CommandSystem.ICommandSender"/>.
@@ -1445,12 +1442,12 @@ namespace Exiled.API.Features
         public static bool TryGet(string args, out Player player) => (player = Get(args)) is not null;
 
         /// <summary>
-        /// Try-get the <see cref="Player"/> from NwPluginAPI class.
+        /// Try-get the <see cref="Player"/> from LabApi class.
         /// </summary>
-        /// <param name="apiPlayer">The <see cref="PluginAPI.Core.Player"/> class.</param>
+        /// <param name="apiPlayer">The <see cref="LabApi.Features.Wrappers.Player"/> class.</param>
         /// <param name="player">The player found or <see langword="null"/> if not found.</param>
         /// <returns>A boolean indicating whether a player was found.</returns>
-        public static bool TryGet(PluginAPI.Core.Player apiPlayer, out Player player) => (player = Get(apiPlayer)) is not null;
+        public static bool TryGet(LabApi.Features.Wrappers.Player apiPlayer, out Player player) => (player = Get(apiPlayer)) is not null;
 
         /// <summary>
         /// Try-get player by <see cref="Collider"/>.
@@ -1489,10 +1486,10 @@ namespace Exiled.API.Features
         {
             if (isPermanent)
             {
-                if (ReservedSlots.HasReservedSlot(userId))
+                if (LabApi.Features.Wrappers.ReservedSlots.HasReservedSlot(userId))
                     return false;
 
-                ReservedSlots.Add(userId);
+                LabApi.Features.Wrappers.ReservedSlots.Add(userId);
                 return true;
             }
 
@@ -1513,7 +1510,7 @@ namespace Exiled.API.Features
                 if (WhiteList.IsOnWhitelist(userId))
                     return false;
 
-                Whitelist.Add(userId);
+                LabApi.Features.Wrappers.Whitelist.Add(userId);
                 return true;
             }
 
@@ -1805,7 +1802,7 @@ namespace Exiled.API.Features
         /// <param name="group">The group to be set.</param>
         public void SetRank(string name, UserGroup group)
         {
-            if (ServerStatic.GetPermissionsHandler()._groups.TryGetValue(name, out UserGroup userGroup))
+            if (ServerStatic.PermissionsHandler.Groups.TryGetValue(name, out UserGroup userGroup))
             {
                 userGroup.BadgeColor = group.BadgeColor;
                 userGroup.BadgeText = name;
@@ -1816,15 +1813,15 @@ namespace Exiled.API.Features
             }
             else
             {
-                ServerStatic.GetPermissionsHandler()._groups.Add(name, group);
+                ServerStatic.PermissionsHandler.Groups.Add(name, group);
 
                 ReferenceHub.serverRoles.SetGroup(group, false, false);
             }
 
-            if (ServerStatic.GetPermissionsHandler()._members.ContainsKey(UserId))
-                ServerStatic.GetPermissionsHandler()._members[UserId] = name;
+            if (ServerStatic.PermissionsHandler.Members.ContainsKey(UserId))
+                ServerStatic.PermissionsHandler.Members[UserId] = name;
             else
-                ServerStatic.GetPermissionsHandler()._members.Add(UserId, name);
+                ServerStatic.PermissionsHandler.Members.Add(UserId, name);
         }
 
         /// <summary>
@@ -2084,9 +2081,6 @@ namespace Exiled.API.Features
         {
             Vector3 currentScale = Scale;
 
-            if (fakeScale == currentScale)
-                return;
-
             try
             {
                 ReferenceHub.transform.localScale = fakeScale;
@@ -2193,6 +2187,12 @@ namespace Exiled.API.Features
         /// <summary>
         /// Forces the player to use an item.
         /// </summary>
+        /// <param name="usable">The item to be used.</param>
+        public void UseItem(Usable usable) => usable?.Use(this);
+
+        /// <summary>
+        /// Forces the player to use an item.
+        /// </summary>
         /// <param name="item">The item to be used.</param>
         /// <returns><see langword="true"/> if item was used successfully. Otherwise, <see langword="false"/>.</returns>
         public bool UseItem(Item item)
@@ -2200,14 +2200,7 @@ namespace Exiled.API.Features
             if (item is not Usable usableItem)
                 return false;
 
-            usableItem.Base.Owner = referenceHub;
-            usableItem.Base.ServerOnUsingCompleted();
-
-            typeof(UsableItemsController).InvokeStaticEvent(nameof(UsableItemsController.ServerOnUsingCompleted), new object[] { referenceHub, usableItem.Base });
-
-            if (usableItem.Base is not null)
-                usableItem.Destroy();
-
+            UseItem(usableItem);
             return true;
         }
 
@@ -2784,7 +2777,7 @@ namespace Exiled.API.Features
         /// <param name="pickup">The <see cref="Pickup"/> of the item to be added.</param>
         /// <param name="addReason">The reason the item was added.</param>
         /// <returns>The <see cref="Item"/> that was added.</returns>
-        public Item AddItem(Pickup pickup, ItemAddReason addReason = ItemAddReason.Undefined) => Item.Get(Inventory.ServerAddItem(pickup.Type, addReason, pickup.Serial, pickup.Base));
+        public Item AddItem(Pickup pickup, ItemAddReason addReason = ItemAddReason.AdminCommand) => Item.Get(Inventory.ServerAddItem(pickup.Type, addReason, pickup.Serial, pickup.Base));
 
         /// <summary>
         /// Adds an item to the player's inventory.
@@ -2794,7 +2787,7 @@ namespace Exiled.API.Features
         /// <returns>The <see cref="Item"/> that was added.</returns>
         public Item AddItem(FirearmPickup pickup, IEnumerable<AttachmentIdentifier> identifiers)
         {
-            Firearm firearm = Item.Get<Firearm>(Inventory.ServerAddItem(pickup.Type, ItemAddReason.Undefined, pickup.Serial, pickup.Base));
+            Firearm firearm = Item.Get<Firearm>(Inventory.ServerAddItem(pickup.Type, ItemAddReason.AdminCommand, pickup.Serial, pickup.Base));
 
             if (identifiers is not null)
                 firearm.AddAttachment(identifiers);
@@ -2890,6 +2883,26 @@ namespace Exiled.API.Features
             });
 
             return true;
+        }
+
+        /// <summary>
+        /// Removes specific candy from the players <see cref="Scp330"/>.
+        /// </summary>
+        /// <param name="candyType">The <see cref="CandyKindID"/> to remove.</param>
+        /// <param name="removeAll">Remove all candy of that type.</param>
+        /// <returns><see langword="true"/> if a candy was removed.</returns>
+        public bool TryRemoveCandу(CandyKindID candyType, bool removeAll = false)
+        {
+            foreach (Item item in Items)
+            {
+                if (item is not Scp330 bag)
+                    continue;
+
+                if (bag.RemoveCandy(candyType, removeAll) > 0)
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -3514,7 +3527,7 @@ namespace Exiled.API.Features
                     Teleport(locker.transform.position + Vector3.up + offset);
                     break;
                 case LockerChamber chamber:
-                    Teleport(chamber._spawnpoint.position + Vector3.up + offset);
+                    Teleport(chamber.Spawnpoint.position + Vector3.up + offset);
                     break;
                 case ElevatorChamber elevator:
                     Teleport(elevator.transform.position + Vector3.up + offset);
@@ -3717,7 +3730,7 @@ namespace Exiled.API.Features
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return ReferenceHub.GetHashCode();
+            return base.GetHashCode();
         }
 
         /// <summary>
