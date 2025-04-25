@@ -36,7 +36,7 @@ namespace Exiled.API.Features
     public class Npc : Player
     {
         /// <summary>
-        /// The time it takes for the NPC to receive its <see cref="CustomHealthStat"/>, <see cref="CustomHumeShieldStat"/> and <see cref="Role"/>.
+        /// The time it takes for the NPC to receive its <see cref="CustomHumeShieldStat"/> and <see cref="Role"/>.
         /// </summary>
         public const float SpawnSetRoleDelay = 0.5f;
 
