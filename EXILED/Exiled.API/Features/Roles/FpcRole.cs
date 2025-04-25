@@ -27,7 +27,7 @@ namespace Exiled.API.Features.Roles
     /// </summary>
     public abstract class FpcRole : Role, IVoiceRole
     {
-        private static FieldInfo enableFallDamageField;
+        private static FieldInfo enableFallDamageSettings;
         private bool isUsingStamina = true;
 
         /// <summary>
@@ -82,12 +82,17 @@ namespace Exiled.API.Features.Roles
         /// </summary>
         public bool IsFallDamageEnable
         {
-            get => FirstPersonController.FpcModule.Motor._enableFallDamage;
-            set
-            {
-                enableFallDamageField ??= AccessTools.Field(typeof(FpcMotor), nameof(FpcMotor._enableFallDamage));
-                enableFallDamageField.SetValue(FirstPersonController.FpcModule.Motor, value);
-            }
+            get => FirstPersonController.FpcModule.Motor._fallDamageSettings.Enabled;
+            set => FirstPersonController.FpcModule.Motor._fallDamageSettings.Enabled = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the multiplier of <see cref="Enums.DamageType.Falldown"/> damage.
+        /// </summary>
+        public float FallDamageMultiplier
+        {
+            get => FirstPersonController.FpcModule.Motor._fallDamageSettings.Multiplier;
+            set => FirstPersonController.FpcModule.Motor._fallDamageSettings.Multiplier = value;
         }
 
         /// <summary>

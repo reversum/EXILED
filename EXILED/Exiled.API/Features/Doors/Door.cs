@@ -22,7 +22,6 @@ namespace Exiled.API.Features.Doors
     using UnityEngine;
 
     using BaseBreakableDoor = Interactables.Interobjects.BreakableDoor;
-    using BaseKeycardPermissions = Interactables.Interobjects.DoorUtils.KeycardPermissions;
     using Breakable = BreakableDoor;
     using Checkpoint = CheckpointDoor;
     using Elevator = ElevatorDoor;
@@ -181,8 +180,8 @@ namespace Exiled.API.Features.Doors
         /// </remarks>
         public KeycardPermissions KeycardPermissions
         {
-            get => (KeycardPermissions)RequiredPermissions.RequiredPermissions;
-            set => RequiredPermissions.RequiredPermissions = (BaseKeycardPermissions)value;
+            get => (KeycardPermissions)Base.RequiredPermissions.RequiredPermissions;
+            set => Base.RequiredPermissions = new((DoorPermissionFlags)value, Base.RequiredPermissions.RequireAll, Base.RequiredPermissions.Bypass2176);
         }
 
         /// <summary>
@@ -240,15 +239,6 @@ namespace Exiled.API.Features.Doors
         /// Gets the name of this door.
         /// </summary>
         public string Name => Nametag == null ? GameObject.name.GetBefore(' ') : Nametag.GetName.RemoveBracketsOnEndOfName();
-
-        /// <summary>
-        /// Gets or sets the required permissions to open the door.
-        /// </summary>
-        public DoorPermissions RequiredPermissions
-        {
-            get => Base.RequiredPermissions;
-            set => Base.RequiredPermissions = value;
-        }
 
         /// <summary>
         /// Gets or sets the door's rotation.
@@ -474,11 +464,11 @@ namespace Exiled.API.Features.Doors
         {
             switch (Base)
             {
-                case Interactables.Interobjects.BasicDoor basic:
-                    basic.RpcPlayBeepSound(beep is not DoorBeepType.InteractionAllowed);
+                case Interactables.Interobjects.BasicDoor basic when beep is not DoorBeepType.InteractionAllowed:
+                    basic.RpcPlayBeepSound();
                     break;
-                case Interactables.Interobjects.CheckpointDoor chkPt:
-                    chkPt.RpcPlayBeepSound((byte)Mathf.Min((int)beep, 3));
+                case Interactables.Interobjects.CheckpointDoor chkPt when beep is not DoorBeepType.InteractionAllowed:
+                    chkPt.RpcPlayDeniedBeep();
                     break;
             }
         }
@@ -553,7 +543,7 @@ namespace Exiled.API.Features.Doors
         /// Returns the Door in a human-readable format.
         /// </summary>
         /// <returns>A string containing Door-related data.</returns>
-        public override string ToString() => $"{Type} ({Zone}) [{Room}] *{DoorLockType}* ={RequiredPermissions?.RequiredPermissions}=";
+        public override string ToString() => $"{Type} ({Zone}) [{Room}] *{DoorLockType}* ={KeycardPermissions}=";
 
         /// <summary>
         /// Creates the door object associated with a specific <see cref="DoorVariant"/>.

@@ -49,7 +49,7 @@ namespace Exiled.API.Features.Items
         /// </summary>
         public KeycardPermissions Permissions
         {
-            get => (KeycardPermissions)Base.Permissions;
+            get => (KeycardPermissions)Base.GetPermissions(new());
             set => Base.Permissions = (Interactables.Interobjects.DoorUtils.KeycardPermissions)value;
         }
 
