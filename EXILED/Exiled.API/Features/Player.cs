@@ -180,7 +180,7 @@ namespace Exiled.API.Features
                 Inventory = value.inventory;
                 CameraTransform = value.PlayerCameraReference;
 
-                value.playerStats._dictionarizedTypes[typeof(HealthStat)] = value.playerStats.StatModules[Array.IndexOf(PlayerStats.DefinedModules, typeof(HealthStat))] = CustomHealthStat = new CustomHealthStat { Hub = value };
+                CustomHealthStat = (HealthStat)value.playerStats._dictionarizedTypes[typeof(HealthStat)];
                 value.playerStats._dictionarizedTypes[typeof(HumeShieldStat)] = value.playerStats.StatModules[Array.IndexOf(PlayerStats.DefinedModules, typeof(HumeShieldStat))] = CustomHumeShieldStat = new CustomHumeShieldStat { Hub = value };
             }
         }
@@ -857,7 +857,7 @@ namespace Exiled.API.Features
         public float MaxHealth
         {
             get => CustomHealthStat.MaxValue;
-            set => CustomHealthStat.CustomMaxValue = value;
+            set => CustomHealthStat.MaxValue = value;
         }
 
         /// <summary>
@@ -913,7 +913,7 @@ namespace Exiled.API.Features
         public float MaxHumeShield
         {
             get => CustomHumeShieldStat.MaxValue;
-            set => CustomHumeShieldStat.CustomMaxValue = value;
+            set => CustomHumeShieldStat.MaxValue = value;
         }
 
         /// <summary>
@@ -1161,7 +1161,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets a <see cref="CustomHealthStat"/>.
         /// </summary>
-        protected CustomHealthStat CustomHealthStat { get; set; }
+        protected HealthStat CustomHealthStat { get; set; }
 
         /// <summary>
         /// Converts LabApi player to EXILED player.
