@@ -25,7 +25,7 @@ namespace Exiled.API.Features.Doors
     using Breakable = BreakableDoor;
     using Checkpoint = CheckpointDoor;
     using Elevator = ElevatorDoor;
-    using KeycardPermissions = Enums.KeycardPermissions;
+    using KeycardPermissions = Exiled.API.Enums.KeycardPermissions;
 
     /// <summary>
     /// A wrapper class for <see cref="DoorVariant"/>.
@@ -54,10 +54,6 @@ namespace Exiled.API.Features.Doors
             }
 
             Type = GetDoorType();
-#if DEBUG
-            if (Type is DoorType.UnknownDoor or DoorType.UnknownGate or DoorType.UnknownElevator)
-                Log.Error($"[DOORTYPE UNKNOWN] {this} BASE = {Base}");
-#endif
         }
 
         /// <summary>
@@ -180,8 +176,8 @@ namespace Exiled.API.Features.Doors
         /// </remarks>
         public KeycardPermissions KeycardPermissions
         {
-            get => (KeycardPermissions)Base.RequiredPermissions.RequiredPermissions;
-            set => Base.RequiredPermissions = new((DoorPermissionFlags)value, Base.RequiredPermissions.RequireAll, Base.RequiredPermissions.Bypass2176);
+            get => (KeycardPermissions)RequiredPermissions;
+            set => RequiredPermissions = (DoorPermissionFlags)value;
         }
 
         /// <summary>
@@ -239,6 +235,15 @@ namespace Exiled.API.Features.Doors
         /// Gets the name of this door.
         /// </summary>
         public string Name => Nametag == null ? GameObject.name.GetBefore(' ') : Nametag.GetName.RemoveBracketsOnEndOfName();
+
+        /// <summary>
+        /// Gets or sets the required permissions to open the door.
+        /// </summary>
+        public DoorPermissionFlags RequiredPermissions
+        {
+            get => Base.RequiredPermissions.RequiredPermissions;
+            set => Base.RequiredPermissions.RequiredPermissions = value;
+        }
 
         /// <summary>
         /// Gets or sets the door's rotation.
@@ -603,6 +608,7 @@ namespace Exiled.API.Features.Doors
                         ElevatorGroup.Scp049 => DoorType.ElevatorScp049,
                         ElevatorGroup.GateB => DoorType.ElevatorGateB,
                         ElevatorGroup.GateA => DoorType.ElevatorGateA,
+                        ElevatorGroup.ServerRoom => DoorType.ElevatorServerRoom,
                         ElevatorGroup.LczA01 or ElevatorGroup.LczA02 => DoorType.ElevatorLczA,
                         ElevatorGroup.LczB01 or ElevatorGroup.LczB02 => DoorType.ElevatorLczB,
                         ElevatorGroup.Nuke01 or ElevatorGroup.Nuke02 => DoorType.ElevatorNuke,
@@ -644,8 +650,8 @@ namespace Exiled.API.Features.Doors
                 "173_CONNECTOR" => DoorType.Scp173Connector,
                 "LCZ_WC" => DoorType.LczWc,
                 "HID_CHAMBER" => DoorType.HIDChamber,
-                "HID_UPPER" => DoorType.HIDUpper,
-                "HID_LOWER" => DoorType.HIDLower,
+                "HID_LAB" => DoorType.HIDLab,
+                "HCZ_127_LAB" => DoorType.Hcz127Lab,
                 "173_ARMORY" => DoorType.Scp173Armory,
                 "173_GATE" => DoorType.Scp173Gate,
                 "GR18" => DoorType.GR18Gate,

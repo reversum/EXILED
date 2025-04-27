@@ -75,4 +75,32 @@ namespace Exiled.Events.Patches.Events.Map
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
         }
     }
+
+    /// <summary>
+    /// Patches <see cref="SeedSynchronizer.GenerateLevel"/>.
+    /// Adds the <see cref="Handlers.Map.OnSpawningRoomConnector"/> event.
+    /// </summary>
+    [EventPatch(typeof(Handlers.Map), nameof(Handlers.Map.SpawningRoomConnector))]
+    [HarmonyPatch(typeof(SeedSynchronizer), nameof(SeedSynchronizer.GenerateLevel))]
+    internal static class SpawningRoomConnectorFix
+    {
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+        {
+            List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
+
+            int index = newInstructions.FindIndex(i => i.Calls(Method(typeof(RoomConnectorSpawnpointBase), nameof(RoomConnectorSpawnpointBase.SetupAllRoomConnectors))));
+            List<Label> label = newInstructions[index].labels;
+
+            newInstructions.RemoveAt(index);
+
+            int offset = -1;
+            index = newInstructions.FindIndex(i => i.opcode == OpCodes.Newobj && (ConstructorInfo)i.operand == GetDeclaredConstructors(typeof(LabApi.Events.Arguments.ServerEvents.MapGeneratedEventArgs))[0]) + offset;
+            newInstructions.Insert(index, new CodeInstruction(OpCodes.Call, Method(typeof(RoomConnectorSpawnpointBase), nameof(RoomConnectorSpawnpointBase.SetupAllRoomConnectors))).WithLabels(label));
+
+            for (int z = 0; z < newInstructions.Count; z++)
+                yield return newInstructions[z];
+
+            ListPool<CodeInstruction>.Pool.Return(newInstructions);
+        }
+    }
 }

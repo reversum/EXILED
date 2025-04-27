@@ -281,9 +281,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Denies the unlock.
         /// </summary>
-        public void DenyUnlock() => Base.RpcDenied(Interactables.Interobjects.DoorUtils.DoorPermissionFlags.None);
-
-        // TODO: Documentation
+        public void DenyUnlock() => Base.RpcDenied(DoorPermissionFlags.None);
 
         /// <summary>
         /// Denies the unlock.

@@ -351,7 +351,7 @@ namespace Exiled.API.Features
             get => ReferenceHub.nicknameSync.Network_customPlayerInfoString;
             set
             {
-                if (NicknameSync.ValidateCustomInfo(value, out string rejectionText))
+                if (!NicknameSync.ValidateCustomInfo(value, out string rejectionText))
                 {
                     Log.Error($"Could not set CustomInfo for {Nickname}. Reason: {rejectionText}");
                 }
@@ -2962,9 +2962,6 @@ namespace Exiled.API.Features
         /// <seealso cref="DropItems()"/>
         public void ClearItems(bool destroy = true)
         {
-            if (CurrentArmor is Armor armor)
-                armor.RemoveExcessOnDrop = false;
-
             while (Items.Count > 0)
                 RemoveItem(Items.ElementAt(0), destroy);
         }
