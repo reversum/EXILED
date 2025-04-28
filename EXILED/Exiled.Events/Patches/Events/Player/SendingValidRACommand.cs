@@ -128,16 +128,16 @@ namespace Exiled.Events.Patches.Events.Player
                 });
 
             offset = 1;
-            index = newInstructions.FindIndex(instrction => instrction.Calls(Method(typeof(CommandSender), nameof(CommandSender.RaReply)))) + offset;
+            index = newInstructions.FindIndex(i => i.Calls(Method(typeof(CommandSender), nameof(CommandSender.RaReply)))) + offset;
             newInstructions.InsertRange(
                 index,
-                new CodeInstruction[]
+                new[]
                 {
                     // sender
-                    new (OpCodes.Ldarg_1),
+                    new CodeInstruction(OpCodes.Ldarg_1).MoveLabelsFrom(newInstructions[index]),
 
                     // Player.get(sender)
-                    new (OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new Type[] { typeof(CommandSender) })),
+                    new (OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(CommandSender) })),
 
                     // command
                     new (OpCodes.Ldloc_2),
