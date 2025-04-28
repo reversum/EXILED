@@ -18,7 +18,7 @@ namespace Exiled.Events.Patches.Events.Player
     using Exiled.Events.EventArgs.Player;
 
     using HarmonyLib;
-
+    using LabApi.Features.Enums;
     using RemoteAdmin;
 
     using static HarmonyLib.AccessTools;
@@ -66,8 +66,8 @@ namespace Exiled.Events.Patches.Events.Player
                    // command
                    new (OpCodes.Ldloc_2),
 
-                   // commandtype
-                   new (OpCodes.Ldc_I4_4),
+                   // CommandType.RemoteAdmin
+                   new (OpCodes.Ldc_I4_S, (sbyte)CommandType.RemoteAdmin),
 
                    // query
                    new (OpCodes.Ldarg_0),
@@ -142,8 +142,8 @@ namespace Exiled.Events.Patches.Events.Player
                     // command
                     new (OpCodes.Ldloc_2),
 
-                    // commandtype
-                    new (OpCodes.Ldc_I4_4),
+                    // CommandType.RemoteAdmin
+                    new (OpCodes.Ldc_I4_S, (sbyte)CommandType.RemoteAdmin),
 
                     // query
                     new (OpCodes.Ldarg_0),
