@@ -32,7 +32,7 @@ namespace Exiled.API.Features.Pickups
             Base = pickupBase;
             if (Base is null)
             {
-                Log.Info(GetType());
+                Log.Error($"[KeycardPickup] Base is null: {GetType()}");
             }
         }
 
