@@ -55,7 +55,7 @@ namespace Exiled.API.Features.Doors
 
             Type = GetDoorType();
             if (Base != null && Type is DoorType.UnknownDoor or DoorType.UnknownGate or DoorType.UnknownElevator)
-                Log.Error($"[DoorType] Room: {Room?.Type ?? RoomType.Unknown} Name:{Name} GameObjectName:{GameObject.name}");
+                Log.Warn($"[DoorType] Type: {Type} Room: {Room?.Type ?? RoomType.Unknown} Name:{Name} GameObjectName:{GameObject.name}");
         }
 
         /// <summary>

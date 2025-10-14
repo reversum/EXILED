@@ -373,7 +373,7 @@ namespace Exiled.API.Features
             {
                 if (!NicknameSync.ValidateCustomInfo(value, out string rejectionText))
                 {
-                    Log.Error($"Could not set CustomInfo for {Nickname}. Reason: {rejectionText}");
+                    Log.Warn($"Could not set CustomInfo for {Nickname}. Reason: {rejectionText}");
                 }
 
                 InfoArea = string.IsNullOrEmpty(value) ? InfoArea & ~PlayerInfoArea.CustomInfo : InfoArea |= PlayerInfoArea.CustomInfo;
@@ -2580,7 +2580,6 @@ namespace Exiled.API.Features
         {
             if (!HasCustomAmmoLimit(ammoType))
             {
-                Log.Error($"{nameof(Player)}.{nameof(ResetAmmoLimit)}(AmmoType): AmmoType.{ammoType} does not have a custom limit.");
                 return;
             }
 
@@ -2673,7 +2672,6 @@ namespace Exiled.API.Features
 
             if (!HasCustomCategoryLimit(category))
             {
-                Log.Error($"{nameof(Player)}.{nameof(ResetCategoryLimit)}(ItemCategory): ItemCategory.{category} does not have a custom limit.");
                 return;
             }
 

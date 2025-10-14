@@ -167,7 +167,7 @@ namespace Exiled.API.Features
                 }
                 else
                 {
-                    Log.Error($"[Camera] Add CameraType entry for: [Room: {Room?.Type ?? RoomType.Unknown} Name: {Name}]");
+                    Log.Warn($"[Camera] Add CameraType entry for: [Room: {Room?.Type ?? RoomType.Unknown} Name: {Name}]");
                 }
             }
         }
@@ -209,7 +209,7 @@ namespace Exiled.API.Features
         public ushort Id => Base.SyncId;
 
         /// <summary>
-        /// Gets the generator's <see cref="Room"/>.
+        /// Gets the camera's <see cref="Room"/>.
         /// </summary>
         public Room Room => room ??= Room.Get(Base.Room);
 
