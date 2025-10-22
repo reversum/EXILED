@@ -38,6 +38,7 @@ namespace Exiled.Events.Patches.Events.Item
 
             newInstructions.InsertRange(0, new CodeInstruction[]
             {
+                // oldWearState = this.WearState
                 new(OpCodes.Ldarg_0),
                 new(OpCodes.Call, PropertyGetter(typeof(JailbirdDeteriorationTracker), nameof(JailbirdDeteriorationTracker.WearState))),
                 new(OpCodes.Stloc_S, oldState.LocalIndex),
@@ -46,11 +47,11 @@ namespace Exiled.Events.Patches.Events.Item
             int offset = 1;
             int index = newInstructions.FindIndex(x => x.opcode == OpCodes.Stloc_2) + offset;
 
-            newInstructions.InsertRange(index, new[]
+            newInstructions.InsertRange(index, new CodeInstruction[]
             {
                 // if (oldWearState == newWearState)
                 //    return;
-                new CodeInstruction(OpCodes.Ldloc_S, oldState.LocalIndex),
+                new(OpCodes.Ldloc_S, oldState.LocalIndex),
                 new(OpCodes.Ldloc_2),
                 new(OpCodes.Beq, retLabel),
 
@@ -89,12 +90,6 @@ namespace Exiled.Events.Patches.Events.Item
 
             newInstructions.InsertRange(index, new CodeInstruction[]
             {
-                // if (oldWearState == newWearState)
-                //    return;
-                new(OpCodes.Ldloc_S, oldState.LocalIndex),
-                new(OpCodes.Ldloc_2),
-                new(OpCodes.Beq, retLabel),
-
                 // this._jailbird
                 new(OpCodes.Ldarg_0),
                 new(OpCodes.Ldfld, Field(typeof(JailbirdDeteriorationTracker), nameof(JailbirdDeteriorationTracker._jailbird))),
