@@ -81,7 +81,6 @@ namespace Exiled.API.Features
             ["WARHEAD ARMORY"] = CameraType.HczWarheadArmory,
             ["WARHEAD CONTROL"] = CameraType.HczWarheadControl,
             ["WARHEAD HALLWAY"] = CameraType.HczWarheadHallway,
-            ["WARHEAD TOP"] = CameraType.HczWarheadTop,
 
             // Light Containment Zone
             ["173 BOTTOM"] = CameraType.Lcz173Bottom,

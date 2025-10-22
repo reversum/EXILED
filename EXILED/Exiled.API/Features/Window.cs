@@ -248,7 +248,6 @@ namespace Exiled.API.Features
                 _ => GlassType.Unknown,
             },
             "glass" => GlassType.Scp079,
-            "HCZ_IncineratorWayside" => GlassType.Incinerator,
             "VTGLASS" => GlassType.Plants,
             _ => GlassType.Unknown,
         };
