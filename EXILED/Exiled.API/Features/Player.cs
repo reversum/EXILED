@@ -146,11 +146,17 @@ namespace Exiled.API.Features
         public static IEnumerable<Player> Enumerable => Dictionary.Values;
 
         /// <summary>
-        /// Gets the number of players currently on the server.
+        /// Gets the number of players (Count Dummy with it) currently on the server.
         /// </summary>
         /// <seealso cref="List"/>
         /// <seealso cref="Enumerable"/>
-        public static int Count => Player.List.Count;
+        /// <seealso cref="ConnectedCount"/>
+        public static int Count => List.Count;
+
+        /// <summary>
+        /// Gets the number of connected players currently on the server.
+        /// </summary>
+        public static int ConnectedCount => ReferenceHub.GetPlayerCount(CentralAuth.ClientInstanceMode.ReadyClient);
 
         /// <summary>
         /// Gets a <see cref="Dictionary{TKey, TValue}"/> containing cached <see cref="Player"/> and their user ids.

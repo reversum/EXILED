@@ -146,6 +146,9 @@ namespace Exiled.API.Features
         /// <inheritdoc cref="Player.Count"/>
         public static int PlayerCount => Player.Count;
 
+        /// <inheritdoc cref="Player.ConnectedCount"/>
+        public static int PlayerConnectedCount => Player.ConnectedCount;
+
         /// <summary>
         /// Gets or sets the maximum number of players able to be on the server.
         /// </summary>
