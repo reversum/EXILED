@@ -31,126 +31,87 @@ namespace Exiled.Events.Patches.Events.Item
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
-            LocalBuilder oldState = generator.DeclareLocal(typeof(JailbirdWearState));
+            LocalBuilder oldState = generator.DeclareLocal(typeof(InventorySystem.Items.Jailbird.JailbirdWearState));
             LocalBuilder evChanging = generator.DeclareLocal(typeof(JailbirdChangingWearStateEventArgs));
 
-            Label skipChangedEventLabel = generator.DefineLabel();
             Label retLabel = generator.DefineLabel();
 
-            int originalStloc2Index = newInstructions.FindIndex(x => x.opcode == OpCodes.Stloc_2);
-            if (originalStloc2Index == -1)
-            {
-                for (int i = 0; i < newInstructions.Count; i++)
-                    yield return newInstructions[i];
-
-                ListPool<CodeInstruction>.Pool.Return(newInstructions);
-                yield break;
-            }
-
-            CodeInstruction[] prefixInstructions = new CodeInstruction[]
+            newInstructions.InsertRange(0, new CodeInstruction[]
             {
                 new(OpCodes.Ldarg_0),
                 new(OpCodes.Call, PropertyGetter(typeof(JailbirdDeteriorationTracker), nameof(JailbirdDeteriorationTracker.WearState))),
                 new(OpCodes.Stloc_S, oldState.LocalIndex),
-            };
+            });
 
-            newInstructions.InsertRange(0, prefixInstructions);
-            newInstructions[newInstructions.Count - 1].labels.Add(retLabel);
+            int offset = 1;
+            int index = newInstructions.FindIndex(x => x.opcode == OpCodes.Stloc_2) + offset;
 
-            int targetStloc2Index = originalStloc2Index + prefixInstructions.Length;
-
-            newInstructions.InsertRange(
-                targetStloc2Index + 1,
-                new[]
-                {
-                    // if (oldWearState == newWearState)
-                    //    skipChangedEventLabel;
-                    new CodeInstruction(OpCodes.Ldloc_S, oldState.LocalIndex),
-                    new(OpCodes.Ldloc_2),
-                    new(OpCodes.Beq_S, skipChangedEventLabel),
-
-                    // this._jailbird.Owner
-                    new(OpCodes.Ldarg_0),
-                    new(OpCodes.Ldfld, Field(typeof(JailbirdDeteriorationTracker), nameof(JailbirdDeteriorationTracker._jailbird))),
-                    new(OpCodes.Callvirt, PropertyGetter(typeof(JailbirdItem), nameof(JailbirdItem.Owner))),
-
-                    // this._jailbird
-                    new(OpCodes.Ldarg_0),
-                    new(OpCodes.Ldfld, Field(typeof(JailbirdDeteriorationTracker), nameof(JailbirdDeteriorationTracker._jailbird))),
-
-                    // newWearState
-                    new(OpCodes.Ldloc_2),
-
-                    // oldWearState
-                    new(OpCodes.Ldloc_S, oldState.LocalIndex),
-
-                    // true
-                    new(OpCodes.Ldc_I4_1),
-
-                    // JailbirdChangingWearStateEventArgs ev = new(...)
-                    new(OpCodes.Newobj, GetDeclaredConstructors(typeof(JailbirdChangingWearStateEventArgs))[0]),
-                    new(OpCodes.Stloc_S, evChanging.LocalIndex),
-
-                    // Handlers.Item.OnJailbirdStateChanging(ev)
-                    new(OpCodes.Ldloc_S, evChanging.LocalIndex),
-                    new(OpCodes.Call, Method(typeof(Handlers.Item), nameof(Handlers.Item.OnJailbirdStateChanging))),
-
-                    // if (!IsAllowed)
-                    //    return;
-                    new(OpCodes.Ldloc_S, evChanging.LocalIndex),
-                    new(OpCodes.Callvirt, PropertyGetter(typeof(JailbirdChangingWearStateEventArgs), nameof(JailbirdChangingWearStateEventArgs.IsAllowed))),
-                    new(OpCodes.Brfalse_S, retLabel),
-
-                    // Update local 2
-                    new(OpCodes.Ldloc_S, evChanging.LocalIndex),
-                    new(OpCodes.Callvirt, PropertyGetter(typeof(JailbirdChangingWearStateEventArgs), nameof(JailbirdChangingWearStateEventArgs.NewWearState))),
-                    new(OpCodes.Stloc_2),
-                });
-
-            int dictSetIndex = newInstructions.FindIndex(x => x.Calls(Method(typeof(Dictionary<ushort, InventorySystem.Items.Jailbird.JailbirdWearState>), "set_Item")));
-            if (dictSetIndex == -1)
+            newInstructions.InsertRange(index, new[]
             {
-                for (int i = 0; i < newInstructions.Count; i++)
-                    yield return newInstructions[i];
+                // if (oldWearState == newWearState)
+                //    return;
+                new CodeInstruction(OpCodes.Ldloc_S, oldState.LocalIndex),
+                new(OpCodes.Ldloc_2),
+                new(OpCodes.Beq, retLabel),
 
-                ListPool<CodeInstruction>.Pool.Return(newInstructions);
-                yield break;
-            }
+                // this._jailbird
+                new(OpCodes.Ldarg_0),
+                new(OpCodes.Ldfld, Field(typeof(JailbirdDeteriorationTracker), nameof(JailbirdDeteriorationTracker._jailbird))),
 
-            int insertAfterDictSet = dictSetIndex + 1;
+                // newWearState
+                new(OpCodes.Ldloc_2),
 
-            newInstructions.InsertRange(
-                insertAfterDictSet,
-                new[]
-                {
-                    new CodeInstruction(OpCodes.Nop).WithLabels(skipChangedEventLabel),
+                // oldWearState
+                new(OpCodes.Ldloc_S, oldState.LocalIndex),
 
-                    // if (oldWearState == newWearState)
-                    //    return;
-                    new(OpCodes.Ldloc_S, oldState.LocalIndex),
-                    new(OpCodes.Ldloc_2),
-                    new(OpCodes.Beq_S, retLabel),
+                // JailbirdChangingWearStateEventArgs ev = new(InventorySystem.Items.ItemBase, JailbirdWearState, JailbirdWearState)
+                new(OpCodes.Newobj, GetDeclaredConstructors(typeof(JailbirdChangingWearStateEventArgs))[0]),
+                new(OpCodes.Dup),
+                new(OpCodes.Dup),
+                new(OpCodes.Stloc_S, evChanging.LocalIndex),
 
-                    // this._jailbird.Owner
-                    new(OpCodes.Ldarg_0),
-                    new(OpCodes.Ldfld, Field(typeof(JailbirdDeteriorationTracker), nameof(JailbirdDeteriorationTracker._jailbird))),
-                    new(OpCodes.Callvirt, PropertyGetter(typeof(JailbirdItem), nameof(JailbirdItem.Owner))),
+                // Handlers.Item.OnJailbirdStateChanging(ev)
+                new(OpCodes.Call, Method(typeof(Handlers.Item), nameof(Handlers.Item.OnJailbirdStateChanging))),
 
-                    // this._jailbird
-                    new(OpCodes.Ldarg_0),
-                    new(OpCodes.Ldfld, Field(typeof(JailbirdDeteriorationTracker), nameof(JailbirdDeteriorationTracker._jailbird))),
+                // if (!IsAllowed)
+                //    return;
+                new(OpCodes.Callvirt, PropertyGetter(typeof(JailbirdChangingWearStateEventArgs), nameof(JailbirdChangingWearStateEventArgs.IsAllowed))),
+                new(OpCodes.Brfalse_S, retLabel),
 
-                    // newWearState
-                    new(OpCodes.Ldloc_2),
+                // newWearState = ev.NewWearState;
+                new(OpCodes.Ldloc_S, evChanging.LocalIndex),
+                new(OpCodes.Callvirt, PropertyGetter(typeof(JailbirdChangingWearStateEventArgs), nameof(JailbirdChangingWearStateEventArgs.NewWearState))),
+                new(OpCodes.Stloc_2),
+            });
 
-                    // oldWearState
-                    new(OpCodes.Ldloc_S, oldState.LocalIndex),
+            offset = 1;
+            index = newInstructions.FindIndex(x => x.Calls(Method(typeof(Dictionary<ushort, InventorySystem.Items.Jailbird.JailbirdWearState>), "set_Item")));
 
-                    // JailbirdChangedWearStateEventArgs ev = new(...)
-                    // Handlers.Item.OnJailbirdStateChanged(ev)
-                    new(OpCodes.Newobj, GetDeclaredConstructors(typeof(JailbirdChangedWearStateEventArgs))[0]),
-                    new(OpCodes.Call, Method(typeof(Handlers.Item), nameof(Handlers.Item.OnJailbirdStateChanged))),
-                });
+            newInstructions.InsertRange(index, new CodeInstruction[]
+            {
+                // if (oldWearState == newWearState)
+                //    return;
+                new(OpCodes.Ldloc_S, oldState.LocalIndex),
+                new(OpCodes.Ldloc_2),
+                new(OpCodes.Beq, retLabel),
+
+                // this._jailbird
+                new(OpCodes.Ldarg_0),
+                new(OpCodes.Ldfld, Field(typeof(JailbirdDeteriorationTracker), nameof(JailbirdDeteriorationTracker._jailbird))),
+
+                // newWearState
+                new(OpCodes.Ldloc_2),
+
+                // oldWearState
+                new(OpCodes.Ldloc_S, oldState.LocalIndex),
+
+                // JailbirdChangedWearStateEventArgs ev = new(InventorySystem.Items.ItemBase, JailbirdWearState, JailbirdWearState)
+                // Handlers.Item.OnJailbirdStateChanged(ev)
+                new(OpCodes.Newobj, GetDeclaredConstructors(typeof(JailbirdChangedWearStateEventArgs))[0]),
+                new(OpCodes.Call, Method(typeof(Handlers.Item), nameof(Handlers.Item.OnJailbirdStateChanged))),
+            });
+
+            newInstructions[newInstructions.Count - 1].labels.Add(retLabel);
 
             for (int z = 0; z < newInstructions.Count; z++)
                 yield return newInstructions[z];

@@ -20,16 +20,13 @@ namespace Exiled.Events.EventArgs.Item
         /// <summary>
         /// Initializes a new instance of the <see cref="JailbirdChangingWearStateEventArgs"/> class.
         /// </summary>
-        /// <param name="player">The player who owns the jailbird.</param>
         /// <param name="jailbird">The Jailbird item whose state is changing.</param>
-        /// <param name="isAllowed">Whether the Jailbird's state is allowed to change.</param>
         /// <param name="newWearState">The <see cref="JailbirdWearState"/> the Jailbird is attempting to switch to.</param>
         /// <param name="oldWearState">The current <see cref="JailbirdWearState"/> the Jailbird is at.</param>
-        public JailbirdChangingWearStateEventArgs(ReferenceHub player, InventorySystem.Items.ItemBase jailbird, JailbirdWearState newWearState, JailbirdWearState oldWearState, bool isAllowed = true)
+        public JailbirdChangingWearStateEventArgs(InventorySystem.Items.ItemBase jailbird, JailbirdWearState newWearState, JailbirdWearState oldWearState)
         {
-            Player = Player.Get(player);
             Jailbird = Item.Get<Jailbird>(jailbird);
-            IsAllowed = isAllowed;
+            Player = Jailbird.Owner;
             NewWearState = newWearState;
             OldWearState = oldWearState;
         }
@@ -62,6 +59,6 @@ namespace Exiled.Events.EventArgs.Item
         /// <summary>
         /// Gets or sets a value indicating whether the Jailbird is allowed to change its <see cref="JailbirdWearState"/>.
         /// </summary>
-        public bool IsAllowed { get; set; }
+        public bool IsAllowed { get; set; } = true;
     }
 }
