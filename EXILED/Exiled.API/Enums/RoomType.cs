@@ -292,12 +292,12 @@ namespace Exiled.API.Enums
         /// <summary>
         /// Heavy Containment Zone's cross room with waterfall.
         /// </summary>
-        HczCrossRoomWater,
+        HczDss08,
 
         /// <summary>
         /// Heavy Containment Zone's cross room with waterfall.
         /// </summary>
-        Dss08 = HczCrossRoomWater,
+        HczCrossRoomWater = HczDss08,
 
         /// <summary>
         /// Heavy Containment Zone's corner.
