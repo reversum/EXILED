@@ -10,7 +10,10 @@ namespace Exiled.API.Features.DamageHandlers
     using System;
 
     using Enums;
+    using Exiled.API.Features.Pickups.Projectiles;
+
     using Footprinting;
+    using InventorySystem.Items.Scp1509;
     using Items;
     using PlayerRoles;
     using PlayerRoles.PlayableScps.Scp096;
@@ -113,6 +116,12 @@ namespace Exiled.API.Features.DamageHandlers
                 case DamageType.Jailbird:
                     Base = new JailbirdDamageHandler(Attacker.Hub, damage, Vector3.zero);
                     break;
+                case DamageType.Scp1509:
+                    Base = new Scp1509DamageHandler(Attacker.Hub, damage, Vector3.zero);
+                    break;
+                case DamageType.GrayCandy:
+                    Base = new GrayCandyDamageHandler(Attacker.Hub, damage);
+                    break;
                 case DamageType.MicroHid:
                     InventorySystem.Items.MicroHID.MicroHIDItem microHidOwner = new();
                     microHidOwner.Owner = attacker.ReferenceHub;
@@ -184,7 +193,9 @@ namespace Exiled.API.Features.DamageHandlers
                     Base = new PlayerStatsSystem.ScpDamageHandler(attacker.ReferenceHub, damage, DeathTranslations.Unknown);
                     break;
                 case DamageType.Scp018:
-                    Base = new PlayerStatsSystem.ScpDamageHandler(attacker.ReferenceHub, damage, DeathTranslations.Unknown);
+                    Scp018Projectile scp018Projectile = Projectile.Create<Scp018Projectile>(ProjectileType.Scp018);
+                    scp018Projectile.PreviousOwner = attacker;
+                    Base = new Scp018DamageHandler(scp018Projectile.Base, damage, true);
                     break;
                 case DamageType.Scp207:
                     Base = new PlayerStatsSystem.ScpDamageHandler(attacker.ReferenceHub, damage, DeathTranslations.Scp207);
