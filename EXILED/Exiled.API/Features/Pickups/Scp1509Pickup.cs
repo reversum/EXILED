@@ -64,9 +64,9 @@ namespace Exiled.API.Features.Pickups
         public float UnequipDecayDelay { get; set; }
 
         /// <summary>
-        /// Returns the RadioPickup in a human readable format.
+        /// Returns the Scp1509Pickup in a human readable format.
         /// </summary>
-        /// <returns>A string containing RadioPickup related data.</returns>
+        /// <returns>A string containing Scp1509Pickup related data.</returns>
         public override string ToString() => $"{Type} ({Serial}) [{Weight}] *{Scale}* |{ShieldRegenRate}| -{ShieldDecayRate}- /{ShieldOnDamagePause}/ ^{UnequipDecayDelay}^";
 
         /// <inheritdoc/>
