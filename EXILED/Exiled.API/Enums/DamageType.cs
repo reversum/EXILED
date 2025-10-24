@@ -278,5 +278,15 @@ namespace Exiled.API.Enums
         /// Damage type for <see cref="PlayerStatsSystem.SilentDamageHandler"/>.
         /// </summary>
         Silent,
+
+        /// <summary>
+        /// Damage type for <see cref="PlayerStatsSystem.GrayCandyDamageHandler"/>.
+        /// </summary>
+        GrayCandy,
+
+        /// <summary>
+        /// Damage caused by <see cref="ItemType.SCP1509"/>.
+        /// </summary>
+        Scp1509,
     }
 }

@@ -7,14 +7,13 @@
 
 namespace Exiled.API.Extensions
 {
-    using System.Collections.Generic;
-
     using Enums;
-
     using Features;
+    using InventorySystem.Items.Scp1509;
     using PlayerRoles.PlayableScps.Scp1507;
     using PlayerRoles.PlayableScps.Scp3114;
     using PlayerStatsSystem;
+    using System.Collections.Generic;
 
     /// <summary>
     /// A set of extensions for <see cref="DamageType"/>.
@@ -51,6 +50,7 @@ namespace Exiled.API.Extensions
             { DeathTranslations.Hypothermia.Id, DamageType.Hypothermia },
             { DeathTranslations.MarshmallowMan.Id, DamageType.Marshmallow },
             { DeathTranslations.Scp1344.Id, DamageType.SeveredEyes },
+            { DeathTranslations.Scp1509.Id, DamageType.Scp1509 },
         };
 
         private static readonly Dictionary<DeathTranslation, DamageType> TranslationConversionInternal = new()
@@ -188,6 +188,10 @@ namespace Exiled.API.Extensions
                     return DamageType.Scp956;
                 case SnowballDamageHandler:
                     return DamageType.SnowBall;
+                case GrayCandyDamageHandler:
+                    return DamageType.GrayCandy;
+                case Scp1509DamageHandler:
+                    return DamageType.Scp1509;
                 case Scp049DamageHandler scp049DamageHandler:
                     return scp049DamageHandler.DamageSubType switch
                     {

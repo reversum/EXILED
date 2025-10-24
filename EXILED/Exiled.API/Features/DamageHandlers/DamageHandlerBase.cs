@@ -15,6 +15,7 @@ namespace Exiled.API.Features.DamageHandlers
     using Enums;
     using Exiled.API.Features.Items;
     using Extensions;
+    using InventorySystem.Items.Scp1509;
     using PlayerRoles.PlayableScps.Scp1507;
     using PlayerRoles.PlayableScps.Scp3114;
     using PlayerRoles.PlayableScps.Scp939;
@@ -224,6 +225,10 @@ namespace Exiled.API.Features.DamageHandlers
                     return DamageType.Scp956;
                 case SnowballDamageHandler:
                     return DamageType.SnowBall;
+                case GrayCandyDamageHandler:
+                    return DamageType.GrayCandy;
+                case Scp1509DamageHandler:
+                    return DamageType.Scp1509;
                 case Scp3114DamageHandler scp3114DamageHandler:
                     return scp3114DamageHandler.Subtype switch
                     {
