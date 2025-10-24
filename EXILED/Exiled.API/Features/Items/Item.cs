@@ -25,6 +25,7 @@ namespace Exiled.API.Features.Items
     using InventorySystem.Items.MicroHID;
     using InventorySystem.Items.Pickups;
     using InventorySystem.Items.Radio;
+    using InventorySystem.Items.Scp1509;
     using InventorySystem.Items.ThrowableProjectiles;
     using InventorySystem.Items.ToggleableLights;
     using InventorySystem.Items.Usables;
@@ -254,6 +255,7 @@ namespace Exiled.API.Features.Items
                     Scp018Projectile => new Scp018(throwable),
                     _ => new Throwable(throwable),
                 },
+                Scp1509Item scp1509 => new Scp1509(scp1509),
                 _ => new(itemBase),
             };
         }
@@ -353,6 +355,7 @@ namespace Exiled.API.Features.Items
                 Scp018Projectile => new Scp018(type, owner),
                 _ => new Throwable(type, owner),
             },
+            Scp1509Item => new Scp1509(),
             _ => new(type),
         };
 

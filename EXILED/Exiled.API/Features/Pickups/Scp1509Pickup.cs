@@ -33,7 +33,7 @@ namespace Exiled.API.Features.Pickups
         /// Initializes a new instance of the <see cref="Scp1509Pickup"/> class.
         /// </summary>
         internal Scp1509Pickup()
-            : base(ItemType.Radio)
+            : base(ItemType.SCP1509)
         {
             Base = (BaseScp1509)((Pickup)this).Base;
         }
