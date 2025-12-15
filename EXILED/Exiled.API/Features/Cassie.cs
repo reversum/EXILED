@@ -65,7 +65,7 @@ namespace Exiled.API.Features
             for (int i = 0; i < cassies.Length; i++)
                 announcement.Append($"{translations[i].Replace(' ', ' ')}<size=0> {cassies[i]} </size><split>");
 
-            new CassieAnnouncement(new CassieTtsPayload(message, translation, isNoisy), 0f, isNoisy ? 1 : 0).AddToQueue();
+            new CassieAnnouncement(new CassieTtsPayload(message, announcement.ToString(), isNoisy), 0f, isNoisy ? 1 : 0).AddToQueue();
             StringBuilderPool.Pool.Return(announcement);
         }
 
