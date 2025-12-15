@@ -47,7 +47,7 @@ namespace Exiled.API.Features
         /// <param name="isNoisy">Indicates whether C.A.S.S.I.E has to make noises during the message.</param>
         /// <param name="isSubtitles">Indicates whether C.A.S.S.I.E has to make subtitles.</param>
         public static void Message(string message, bool isHeld = false, bool isNoisy = true, bool isSubtitles = false) =>
-            new CassieAnnouncement(new CassieTtsPayload(message, isSubtitles, isHeld), 0f, isNoisy ? 1 : 0).AddToQueue();
+            new CassieAnnouncement(new CassieTtsPayload(message, isSubtitles, isNoisy), 0f, isNoisy ? 1 : 0).AddToQueue();
 
         /// <summary>
         /// Reproduce a non-glitched C.A.S.S.I.E message with a possibility to custom the subtitles.
@@ -65,7 +65,7 @@ namespace Exiled.API.Features
             for (int i = 0; i < cassies.Length; i++)
                 announcement.Append($"{translations[i].Replace(' ', ' ')}<size=0> {cassies[i]} </size><split>");
 
-            new CassieAnnouncement(new CassieTtsPayload(message, isSubtitles, isHeld), 0f, isNoisy ? 1 : 0).AddToQueue();
+            new CassieAnnouncement(new CassieTtsPayload(message, translation, isNoisy), 0f, isNoisy ? 1 : 0).AddToQueue();
             StringBuilderPool.Pool.Return(announcement);
         }
 
@@ -87,7 +87,7 @@ namespace Exiled.API.Features
         /// <param name="isNoisy">Indicates whether C.A.S.S.I.E has to make noises during the message.</param>
         /// <param name="isSubtitles">Indicates whether C.A.S.S.I.E has to make subtitles.</param>
         public static void DelayedMessage(string message, float delay, bool isHeld = false, bool isNoisy = true, bool isSubtitles = false) =>
-            Timing.CallDelayed(delay, () => new CassieAnnouncement(new CassieTtsPayload(message, isSubtitles, isHeld), 0f, isNoisy ? 1 : 0).AddToQueue());
+            Timing.CallDelayed(delay, () => new CassieAnnouncement(new CassieTtsPayload(message, isSubtitles, isNoisy), 0f, isNoisy ? 1 : 0).AddToQueue());
 
         /// <summary>
         /// Reproduce a glitchy C.A.S.S.I.E announcement after a certain period of seconds.
